@@ -1,0 +1,370 @@
+'use client';
+
+import Link from 'next/link';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Grid from '@mui/material/Grid';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Chip from '@mui/material/Chip';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
+import PhoneForwardedIcon from '@mui/icons-material/PhoneForwarded';
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import BusinessIcon from '@mui/icons-material/Business';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
+const plans = [
+  {
+    title: 'Park',
+    price: 2.99,
+    icon: <LocalParkingIcon sx={{ fontSize: 44 }} />,
+    color: '#4BA0A1',
+    description: 'Reserve your number and receive voicemail notifications. Perfect for holding a number until you need it.',
+    features: [
+      'Reserve phone number',
+      'Custom voicemail greeting',
+      'Email voicemail notifications',
+      'Number protection',
+      'Online dashboard access',
+    ],
+  },
+  {
+    title: 'Forward',
+    price: 6.99,
+    icon: <PhoneForwardedIcon sx={{ fontSize: 44 }} />,
+    color: '#84BD00',
+    description: 'Forward incoming calls to any phone number. Great for personal or small business use.',
+    features: [
+      'Everything in Park',
+      'Call forwarding to any phone',
+      'Caller ID passthrough',
+      'Scheduled forwarding rules',
+      'Simultaneous ring',
+      'Missed call notifications',
+    ],
+  },
+  {
+    title: 'Unlimited',
+    price: 19.99,
+    icon: <AllInclusiveIcon sx={{ fontSize: 44 }} />,
+    color: '#F7941E',
+    popular: true,
+    description: 'Full communication suite with unlimited calling, SMS, and voicemail transcription.',
+    features: [
+      'Everything in Forward',
+      'Unlimited inbound/outbound calls',
+      'SMS and MMS messaging',
+      'Voicemail transcription',
+      'Call recording',
+      'Mobile and desktop apps',
+      'Priority support',
+    ],
+  },
+  {
+    title: 'Business',
+    price: 9.99,
+    icon: <BusinessIcon sx={{ fontSize: 44 }} />,
+    color: '#144B6E',
+    description: 'Professional features for businesses including auto-attendant, call routing, and analytics.',
+    features: [
+      'Everything in Park',
+      'Auto-attendant / IVR',
+      'Business hours routing',
+      'Call analytics dashboard',
+      'Professional greeting recording',
+      'Multiple extension support',
+    ],
+  },
+];
+
+const comparisonFeatures = [
+  { label: 'Number Reservation', park: true, forward: true, unlimited: true, business: true },
+  { label: 'Custom Voicemail', park: true, forward: true, unlimited: true, business: true },
+  { label: 'Email Notifications', park: true, forward: true, unlimited: true, business: true },
+  { label: 'Online Dashboard', park: true, forward: true, unlimited: true, business: true },
+  { label: 'Call Forwarding', park: false, forward: true, unlimited: true, business: true },
+  { label: 'Caller ID Passthrough', park: false, forward: true, unlimited: true, business: false },
+  { label: 'Scheduled Forwarding', park: false, forward: true, unlimited: true, business: true },
+  { label: 'Unlimited Calling', park: false, forward: false, unlimited: true, business: false },
+  { label: 'SMS / MMS Messaging', park: false, forward: false, unlimited: true, business: false },
+  { label: 'Voicemail Transcription', park: false, forward: false, unlimited: true, business: false },
+  { label: 'Call Recording', park: false, forward: false, unlimited: true, business: false },
+  { label: 'Auto-Attendant / IVR', park: false, forward: false, unlimited: false, business: true },
+  { label: 'Business Hours Routing', park: false, forward: false, unlimited: false, business: true },
+  { label: 'Call Analytics', park: false, forward: false, unlimited: false, business: true },
+  { label: 'Priority Support', park: false, forward: false, unlimited: true, business: true },
+];
+
+function FeatureCheck({ included }: { included: boolean }) {
+  return included ? (
+    <CheckCircleIcon sx={{ color: '#84BD00', fontSize: 22 }} />
+  ) : (
+    <CancelIcon sx={{ color: '#E0E6ED', fontSize: 22 }} />
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Box className="animate-fadeIn">
+      {/* Header */}
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)',
+          py: { xs: 8, md: 10 },
+          textAlign: 'center',
+          color: '#fff',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '-30%',
+            right: '-15%',
+            width: '400px',
+            height: '400px',
+            background: 'radial-gradient(circle, rgba(247,148,30,0.12) 0%, transparent 70%)',
+            borderRadius: '50%',
+            pointerEvents: 'none',
+          }}
+        />
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+          <Chip
+            label="Pricing"
+            size="small"
+            sx={{
+              bgcolor: 'rgba(255,255,255,0.15)',
+              color: '#fff',
+              fontWeight: 700,
+              mb: 2,
+              fontSize: '0.8rem',
+              backdropFilter: 'blur(8px)',
+            }}
+          />
+          <Typography variant="h2" sx={{ mb: 2, fontSize: { xs: '1.75rem', md: '2.75rem', lg: '3rem' }, fontWeight: 800, color: '#fff' }}>
+            Simple, Transparent Pricing
+          </Typography>
+          <Typography variant="h6" sx={{ fontWeight: 400, opacity: 0.9, mb: 1, fontSize: { md: '1.15rem' }, color: '#fff' }}>
+            Choose the plan that fits your needs. No hidden fees, cancel anytime.
+          </Typography>
+        </Container>
+
+      </Box>
+
+      {/* Plan Cards */}
+      <Container maxWidth="lg" sx={{ mt: -4, mb: 8, position: 'relative', zIndex: 1 }}>
+        <Grid container spacing={3}>
+          {plans.map((plan) => (
+            <Grid key={plan.title} size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card
+                className="card-lift"
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  border: plan.popular ? `2px solid ${plan.color}` : '1px solid transparent',
+                  borderRadius: 4,
+                  overflow: 'visible',
+                }}
+              >
+                {plan.popular && (
+                  <Chip
+                    label="Most Popular"
+                    size="small"
+                    sx={{
+                      position: 'absolute',
+                      top: -12,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      bgcolor: plan.color,
+                      color: '#fff',
+                      fontWeight: 700,
+                      zIndex: 1,
+                    }}
+                  />
+                )}
+                <CardContent sx={{ flex: 1, textAlign: 'center', pt: plan.popular ? 4.5 : 3.5, px: 3 }}>
+                  <Box sx={{ color: plan.color, mb: 2 }}>{plan.icon}</Box>
+                  <Typography variant="h4" sx={{ mb: 1.5 }}>
+                    {plan.title}
+                  </Typography>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography
+                      component="span"
+                      sx={{ fontSize: '2.75rem', fontWeight: 800, color: 'text.primary', lineHeight: 1 }}
+                    >
+                      ${plan.price.toFixed(2)}
+                    </Typography>
+                    <Typography component="span" color="text.secondary" sx={{ fontSize: '1rem' }}>
+                      /mo
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 3, lineHeight: 1.6, minHeight: 60 }}
+                  >
+                    {plan.description}
+                  </Typography>
+                  {plan.features.map((feature) => (
+                    <Box
+                      key={feature}
+                      sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.25, textAlign: 'left' }}
+                    >
+                      <CheckCircleIcon sx={{ fontSize: 18, color: plan.color, flexShrink: 0 }} />
+                      <Typography variant="body2" color="text.secondary">
+                        {feature}
+                      </Typography>
+                    </Box>
+                  ))}
+                </CardContent>
+                <CardActions sx={{ p: 3, pt: 1 }}>
+                  <Button
+                    component={Link}
+                    href="/search"
+                    variant={plan.popular ? 'contained' : 'outlined'}
+                    color={plan.popular ? 'secondary' : 'primary'}
+                    fullWidth
+                    size="large"
+                    sx={{ py: 1.25 }}
+                  >
+                    Get Started
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Setup Fee Notice */}
+        <Box
+          sx={{
+            mt: 4,
+            p: 3,
+            bgcolor: '#F7941E08',
+            border: '1px solid #F7941E30',
+            borderRadius: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <InfoOutlinedIcon sx={{ color: '#F7941E', fontSize: 28, flexShrink: 0 }} />
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              One-Time Setup Fee: $5.00
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              All plans include a one-time setup fee of $5.00 per number. This covers number provisioning,
+              configuration, and initial activation. There are no other hidden fees.
+            </Typography>
+          </Box>
+        </Box>
+      </Container>
+
+      {/* Feature Comparison Table */}
+      <Box sx={{ bgcolor: 'background.paper', py: { xs: 6, md: 10 } }}>
+        <Container maxWidth="lg">
+          <Typography variant="h3" sx={{ textAlign: 'center', mb: 5 }}>
+            Feature Comparison
+          </Typography>
+          <TableContainer component={Paper} sx={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)', borderRadius: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ bgcolor: 'primary.main' }}>
+                  <TableCell sx={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem', minWidth: 200 }}>
+                    Feature
+                  </TableCell>
+                  <TableCell align="center" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>
+                    Park<br />
+                    <Typography component="span" sx={{ fontSize: '0.8rem', opacity: 0.85 }}>
+                      $2.99/mo
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>
+                    Forward<br />
+                    <Typography component="span" sx={{ fontSize: '0.8rem', opacity: 0.85 }}>
+                      $6.99/mo
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      color: '#fff',
+                      fontWeight: 700,
+                      fontSize: '0.95rem',
+                      bgcolor: '#F7941E',
+                    }}
+                  >
+                    Unlimited<br />
+                    <Typography component="span" sx={{ fontSize: '0.8rem', opacity: 0.85 }}>
+                      $19.99/mo
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>
+                    Business<br />
+                    <Typography component="span" sx={{ fontSize: '0.8rem', opacity: 0.85 }}>
+                      $9.99/mo
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {comparisonFeatures.map((feature, i) => (
+                  <TableRow
+                    key={feature.label}
+                    sx={{ bgcolor: i % 2 === 0 ? 'transparent' : 'background.paper' }}
+                  >
+                    <TableCell sx={{ fontWeight: 600 }}>{feature.label}</TableCell>
+                    <TableCell align="center"><FeatureCheck included={feature.park} /></TableCell>
+                    <TableCell align="center"><FeatureCheck included={feature.forward} /></TableCell>
+                    <TableCell align="center" sx={{ bgcolor: '#F7941E06' }}>
+                      <FeatureCheck included={feature.unlimited} />
+                    </TableCell>
+                    <TableCell align="center"><FeatureCheck included={feature.business} /></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Container>
+      </Box>
+
+      {/* CTA */}
+      <Box sx={{ py: { xs: 6, md: 8 }, textAlign: 'center' }}>
+        <Container maxWidth="sm">
+          <Typography variant="h3" sx={{ mb: 2 }}>
+            Ready to Get Started?
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+            Find your perfect phone number and choose the plan that works for you.
+          </Typography>
+          <Button
+            component={Link}
+            href="/search"
+            variant="contained"
+            color="secondary"
+            size="large"
+            sx={{ px: 5, py: 1.5, fontSize: '1.05rem' }}
+          >
+            Browse Numbers
+          </Button>
+        </Container>
+      </Box>
+    </Box>
+  );
+}

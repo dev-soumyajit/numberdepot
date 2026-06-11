@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx next build:*)",
+      "Bash(wc:*)",
+      "Bash(npm run build:*)",
+      "Bash(xargs:*)",
+      "Bash(grep:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "Bash(NEXT_PUBLIC_API_URL=http://localhost:5000 npx next build:*)",
+      "WebSearch",
+      "WebFetch(domain:www.numberbarn.com)"
+    ]
+  }
+}

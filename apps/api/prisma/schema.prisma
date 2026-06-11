@@ -1,0 +1,502 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// 1. USERS & AUTHENTICATION
+// ============================================
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  passwordHash   String    @map("password_hash")
+  firstName      String?   @map("first_name")
+  lastName       String?   @map("last_name")
+  phone          String?
+  role           String    @default("buyer") // buyer, seller, admin, super_admin
+  status         String    @default("active") // active, suspended, banned, pending
+  emailVerified  Boolean   @default(false) @map("email_verified")
+  avatarUrl      String?   @map("avatar_url")
+  companyName    String?   @map("company_name")
+  addressLine1   String?   @map("address_line1")
+  addressLine2   String?   @map("address_line2")
+  city           String?
+  state          String?
+  zipCode        String?   @map("zip_code")
+  country        String    @default("US")
+  timezone       String    @default("America/New_York")
+  stripeCustomerId String? @map("stripe_customer_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  lastLoginAt    DateTime? @map("last_login_at")
+
+  refreshTokens   RefreshToken[]
+  passwordResets  PasswordReset[]
+  phoneNumbers    PhoneNumber[]
+  listings        Listing[]
+  offersMade      Offer[]        @relation("BuyerOffers")
+  offersReceived  Offer[]        @relation("SellerOffers")
+  orders          Order[]
+  payments        Payment[]
+  subscriptions   Subscription[]
+  brokerProfile   BrokerProfile?
+  portRequests    PortRequest[]
+  notifications   Notification[]
+  blogPosts       BlogPost[]
+  auditLogs       AuditLog[]
+  orderItemsSold  OrderItem[]    @relation("SellerOrderItems")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_resets")
+}
+
+// ============================================
+// 2. PHONE NUMBERS & INVENTORY
+// ============================================
+
+model PhoneNumber {
+  id           String   @id @default(uuid())
+  number       String   @unique // E.164: +12125551234
+  formatted    String   // (212) 555-1234
+  countryCode  String   @default("+1") @map("country_code")
+  areaCode     String   @map("area_code")
+  numberType   String   @map("number_type") // local, toll_free, vanity, canadian, uk
+  vanityText   String?  @map("vanity_text") // e.g., "FLOWERS"
+  source       String   @default("platform") // platform, broker, ported_in
+  ownerId      String?  @map("owner_id")
+  status       String   @default("available") // available, reserved, sold, parked, forwarding, ported_out, delisted
+
+  basePrice    Decimal  @default(5.00) @map("base_price") @db.Decimal(10, 2)
+  monthlyPrice Decimal? @map("monthly_price") @db.Decimal(10, 2)
+
+  isVanity    Boolean @default(false) @map("is_vanity")
+  isPremium   Boolean @default(false) @map("is_premium")
+  isPortable  Boolean @default(true) @map("is_portable")
+  pattern     String? // repeater, sequential, vanity
+  stateName   String? @map("state_name")
+  cityName    String? @map("city_name")
+  rateCenter  String? @map("rate_center")
+  searchText  String? @map("search_text")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner        User?         @relation(fields: [ownerId], references: [id])
+  listings     Listing[]
+  offers       Offer[]
+  orderItems   OrderItem[]
+  portRequests PortRequest[]
+  subscriptions Subscription[]
+
+  @@index([areaCode])
+  @@index([numberType])
+  @@index([status])
+  @@index([ownerId])
+  @@map("phone_numbers")
+}
+
+// ============================================
+// 3. LISTINGS (Broker/Seller Marketplace)
+// ============================================
+
+model Listing {
+  id             String    @id @default(uuid())
+  phoneNumberId  String    @map("phone_number_id")
+  sellerId       String    @map("seller_id")
+  listingType    String    @map("listing_type") // sale, license, both
+  salePrice      Decimal?  @map("sale_price") @db.Decimal(10, 2)
+  licensePrice   Decimal?  @map("license_price") @db.Decimal(10, 2)
+  minimumOffer   Decimal?  @map("minimum_offer") @db.Decimal(10, 2)
+  allowOffers    Boolean   @default(true) @map("allow_offers")
+  status         String    @default("active") // active, pending, sold, licensed, expired, delisted
+  isFeatured     Boolean   @default(false) @map("is_featured")
+  isBoosted      Boolean   @default(false) @map("is_boosted")
+  boostExpiresAt DateTime? @map("boost_expires_at")
+  viewsCount     Int       @default(0) @map("views_count")
+  offersCount    Int       @default(0) @map("offers_count")
+  listedAt       DateTime  @default(now()) @map("listed_at")
+  soldAt         DateTime? @map("sold_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  seller      User        @relation(fields: [sellerId], references: [id])
+  offers      Offer[]
+  orderItems  OrderItem[]
+
+  @@index([sellerId])
+  @@index([status])
+  @@map("listings")
+}
+
+// ============================================
+// 4. OFFERS & NEGOTIATIONS
+// ============================================
+
+model Offer {
+  id             String    @id @default(uuid())
+  listingId      String?   @map("listing_id")
+  phoneNumberId  String    @map("phone_number_id")
+  buyerId        String    @map("buyer_id")
+  sellerId       String    @map("seller_id")
+  offerType      String    @map("offer_type") // buy, license
+  amount         Decimal   @db.Decimal(10, 2)
+  counterAmount  Decimal?  @map("counter_amount") @db.Decimal(10, 2)
+  status         String    @default("pending") // pending, accepted, declined, countered, expired, cancelled
+  buyerMessage   String?   @map("buyer_message")
+  sellerResponse String?   @map("seller_response")
+  expiresAt      DateTime? @map("expires_at")
+  respondedAt    DateTime? @map("responded_at")
+  parentOfferId  String?   @map("parent_offer_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  listing     Listing?     @relation(fields: [listingId], references: [id])
+  phoneNumber PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  buyer       User         @relation("BuyerOffers", fields: [buyerId], references: [id])
+  seller      User         @relation("SellerOffers", fields: [sellerId], references: [id])
+  parentOffer Offer?       @relation("OfferChain", fields: [parentOfferId], references: [id])
+  childOffers Offer[]      @relation("OfferChain")
+
+  @@index([listingId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+  @@map("offers")
+}
+
+// ============================================
+// 5. ORDERS & PAYMENTS
+// ============================================
+
+model Order {
+  id           String    @id @default(uuid())
+  orderNumber  String    @unique @map("order_number") // NDP-2026-00001
+  buyerId      String    @map("buyer_id")
+  subtotal     Decimal   @db.Decimal(10, 2)
+  taxAmount    Decimal   @default(0) @map("tax_amount") @db.Decimal(10, 2)
+  fusfFee      Decimal   @default(0) @map("fusf_fee") @db.Decimal(10, 2)
+  recoveryFee  Decimal   @default(0) @map("recovery_fee") @db.Decimal(10, 2)
+  totalAmount  Decimal   @map("total_amount") @db.Decimal(10, 2)
+  status       String    @default("pending") // pending, processing, completed, failed, refunded, cancelled
+  stripePaymentIntentId String? @map("stripe_payment_intent_id")
+  stripeChargeId        String? @map("stripe_charge_id")
+  notes        String?
+  completedAt  DateTime? @map("completed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  buyer      User        @relation(fields: [buyerId], references: [id])
+  orderItems OrderItem[]
+  payments   Payment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String   @id @default(uuid())
+  orderId        String   @map("order_id")
+  phoneNumberId  String?  @map("phone_number_id")
+  listingId      String?  @map("listing_id")
+  itemType       String   @map("item_type") // purchase, license, port_in, plan_upgrade
+  planType       String?  @map("plan_type") // park, forward, unlimited, business, port_away
+  price          Decimal  @db.Decimal(10, 2)
+  setupFee       Decimal  @default(5.00) @map("setup_fee") @db.Decimal(10, 2)
+  monthlyFee     Decimal? @map("monthly_fee") @db.Decimal(10, 2)
+  sellerId       String?  @map("seller_id")
+  commissionRate Decimal  @default(10.00) @map("commission_rate") @db.Decimal(5, 2)
+  commissionAmount Decimal? @map("commission_amount") @db.Decimal(10, 2)
+  sellerPayout   Decimal? @map("seller_payout") @db.Decimal(10, 2)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  phoneNumber PhoneNumber? @relation(fields: [phoneNumberId], references: [id])
+  listing     Listing?     @relation(fields: [listingId], references: [id])
+  seller      User?        @relation("SellerOrderItems", fields: [sellerId], references: [id])
+  commissions Commission[]
+
+  @@map("order_items")
+}
+
+model Payment {
+  id              String   @id @default(uuid())
+  orderId         String   @map("order_id")
+  userId          String   @map("user_id")
+  amount          Decimal  @db.Decimal(10, 2)
+  currency        String   @default("USD")
+  paymentMethod   String?  @map("payment_method")
+  stripePaymentId String?  @map("stripe_payment_id")
+  stripeReceiptUrl String? @map("stripe_receipt_url")
+  status          String   @default("pending") // pending, succeeded, failed, refunded
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@map("payments")
+}
+
+// ============================================
+// 6. SUBSCRIPTIONS & BILLING
+// ============================================
+
+model Subscription {
+  id                 String    @id @default(uuid())
+  userId             String    @map("user_id")
+  phoneNumberId      String    @map("phone_number_id")
+  planType           String    @map("plan_type") // park, forward, unlimited, business
+  monthlyAmount      Decimal   @map("monthly_amount") @db.Decimal(10, 2)
+  status             String    @default("active") // active, paused, cancelled, expired
+  stripeSubscriptionId String? @map("stripe_subscription_id")
+  currentPeriodStart DateTime? @map("current_period_start")
+  currentPeriodEnd   DateTime? @map("current_period_end")
+  cancelledAt        DateTime? @map("cancelled_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  user        User        @relation(fields: [userId], references: [id])
+  phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id])
+
+  @@map("subscriptions")
+}
+
+// ============================================
+// 7. BROKER/SELLER PROFILES
+// ============================================
+
+model BrokerProfile {
+  id                       String    @id @default(uuid())
+  userId                   String    @unique @map("user_id")
+  businessName             String?   @map("business_name")
+  businessType             String?   @map("business_type") // individual, business
+  ssnLast4                 String?   @map("ssn_last4")
+  ein                      String?
+  w9DocumentUrl            String?   @map("w9_document_url")
+  taxFormType              String?   @map("tax_form_type") // W-9, W-8BEN, W-8BEN-E
+  bankAccountName          String?   @map("bank_account_name")
+  bankRoutingNumber        String?   @map("bank_routing_number")
+  bankAccountNumberEncrypted String? @map("bank_account_number_encrypted")
+  bankAccountType          String?   @map("bank_account_type") // checking, savings
+  stripeConnectAccountId   String?   @map("stripe_connect_account_id")
+  commissionRate           Decimal   @default(10.00) @map("commission_rate") @db.Decimal(5, 2)
+  totalSales               Int       @default(0) @map("total_sales")
+  totalRevenue             Decimal   @default(0) @map("total_revenue") @db.Decimal(12, 2)
+  totalPayouts             Decimal   @default(0) @map("total_payouts") @db.Decimal(12, 2)
+  pendingBalance           Decimal   @default(0) @map("pending_balance") @db.Decimal(12, 2)
+  availableBalance         Decimal   @default(0) @map("available_balance") @db.Decimal(12, 2)
+  status                   String    @default("pending") // pending, approved, suspended, rejected
+  approvedAt               DateTime? @map("approved_at")
+  affiliateCode            String?   @unique @map("affiliate_code")
+  affiliateCommission      Decimal   @default(5.00) @map("affiliate_commission") @db.Decimal(5, 2)
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+
+  user        User         @relation(fields: [userId], references: [id])
+  commissions Commission[]
+  payouts     Payout[]
+
+  @@map("broker_profiles")
+}
+
+// ============================================
+// 8. COMMISSIONS & PAYOUTS
+// ============================================
+
+model Commission {
+  id              String    @id @default(uuid())
+  orderItemId     String    @map("order_item_id")
+  brokerId        String    @map("broker_id")
+  saleAmount      Decimal   @map("sale_amount") @db.Decimal(10, 2)
+  commissionRate  Decimal   @default(10.00) @map("commission_rate") @db.Decimal(5, 2)
+  platformFee     Decimal   @map("platform_fee") @db.Decimal(10, 2)
+  sellerEarnings  Decimal   @map("seller_earnings") @db.Decimal(10, 2)
+  status          String    @default("pending") // pending, held, available, paid_out
+  holdUntil       DateTime? @map("hold_until")
+  availableAt     DateTime? @map("available_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  orderItem     OrderItem     @relation(fields: [orderItemId], references: [id])
+  brokerProfile BrokerProfile @relation(fields: [brokerId], references: [id])
+
+  @@map("commissions")
+}
+
+model Payout {
+  id               String    @id @default(uuid())
+  brokerId         String    @map("broker_id")
+  amount           Decimal   @db.Decimal(10, 2)
+  method           String    @default("ach")
+  stripeTransferId String?   @map("stripe_transfer_id")
+  status           String    @default("pending") // pending, processing, completed, failed
+  processedAt      DateTime? @map("processed_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  brokerProfile BrokerProfile @relation(fields: [brokerId], references: [id])
+
+  @@map("payouts")
+}
+
+// ============================================
+// 9. PORT REQUESTS
+// ============================================
+
+model PortRequest {
+  id                  String    @id @default(uuid())
+  userId              String    @map("user_id")
+  phoneNumberId       String?   @map("phone_number_id")
+  portType            String    @map("port_type") // port_in, port_out
+  currentCarrier      String?   @map("current_carrier")
+  accountNumber       String?   @map("account_number")
+  pin                 String?
+  authorizedName      String?   @map("authorized_name")
+  serviceAddress      String?   @map("service_address")
+  loaDocumentUrl      String?   @map("loa_document_url")
+  loaSigned           Boolean   @default(false) @map("loa_signed")
+  customPortPin       String?   @map("custom_port_pin")
+  status              String    @default("pending") // pending, submitted, processing, completed, rejected, cancelled
+  rejectionReason     String?   @map("rejection_reason")
+  estimatedCompletion DateTime? @map("estimated_completion")
+  completedAt         DateTime? @map("completed_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  user        User         @relation(fields: [userId], references: [id])
+  phoneNumber PhoneNumber? @relation(fields: [phoneNumberId], references: [id])
+
+  @@map("port_requests")
+}
+
+// ============================================
+// 10. NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String    // offer_received, offer_accepted, sale_completed, payout_ready
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean   @default(false) @map("is_read")
+  readAt    DateTime? @map("read_at")
+  channel   String    @default("in_app") // in_app, email, both
+  emailSent Boolean   @default(false) @map("email_sent")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ============================================
+// 11. CONTENT MANAGEMENT
+// ============================================
+
+model BlogPost {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  title         String
+  excerpt       String?
+  content       String
+  featuredImage String?   @map("featured_image")
+  authorId      String    @map("author_id")
+  status        String    @default("draft") // draft, published, archived
+  publishedAt   DateTime? @map("published_at")
+  tags          String[]
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  author User @relation(fields: [authorId], references: [id])
+
+  @@map("blog_posts")
+}
+
+model Faq {
+  id          String   @id @default(uuid())
+  question    String
+  answer      String
+  category    String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  isPublished Boolean  @default(true) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("faqs")
+}
+
+model StaticPage {
+  id              String   @id @default(uuid())
+  slug            String   @unique
+  title           String
+  content         String
+  metaDescription String?  @map("meta_description")
+  isPublished     Boolean  @default(true) @map("is_published")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("static_pages")
+}
+
+// ============================================
+// 12. PLATFORM SETTINGS
+// ============================================
+
+model PlatformSetting {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("platform_settings")
+}
+
+// ============================================
+// 13. AUDIT LOG
+// ============================================
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  action     String
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  oldData    Json?    @map("old_data")
+  newData    Json?    @map("new_data")
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
