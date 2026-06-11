@@ -67,7 +67,7 @@ export const useCart = create<CartState>((set, get) => ({
   },
 }));
 
-/** Wrapper kept for consistency — no-op since Zustand doesn't need a provider */
+/** Wrapper kept for consistency — no-op since Zustand doesn't need a Provider */
 export function CartProvider({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
