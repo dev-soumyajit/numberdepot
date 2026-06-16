@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     await resets.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }).catch(() => {});
 
     // Build reset URL
-    const origin = req.headers.get('origin') || req.nextUrl.origin;
+    const origin = process.env.NEXT_PUBLIC_APP_URL || req.headers.get('origin') || req.nextUrl.origin;
     const resetUrl = `${origin}/reset-password?token=${token}&email=${encodeURIComponent(email.toLowerCase())}`;
 
     await sendPasswordReset(email.toLowerCase(), resetUrl);
