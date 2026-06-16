@@ -125,7 +125,7 @@ export default function AdminAddNumberPage() {
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => router.push('/admin/numbers')}
-          sx={{ color: '#144B6E', textTransform: 'none' }}
+          sx={{ color: '#002664', textTransform: 'none' }}
         >
           Back to Numbers
         </Button>
@@ -239,7 +239,7 @@ export default function AdminAddNumberPage() {
                 <Switch
                   checked={form.isVanity}
                   onChange={handleSwitch('isVanity')}
-                  sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#F7941E' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#F7941E' } }}
+                  sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#E53935' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#E53935' } }}
                 />
               }
               label="Vanity Number"
@@ -259,7 +259,7 @@ export default function AdminAddNumberPage() {
                 <Switch
                   checked={form.isPremium}
                   onChange={handleSwitch('isPremium')}
-                  sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#144B6E' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#144B6E' } }}
+                  sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#002664' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#002664' } }}
                 />
               }
               label="Premium"
@@ -330,8 +330,8 @@ export default function AdminAddNumberPage() {
               onClick={handleSubmit}
               disabled={saving}
               sx={{
-                bgcolor: '#144B6E',
-                '&:hover': { bgcolor: '#0D3A56' },
+                bgcolor: '#002664',
+                '&:hover': { bgcolor: '#001a45' },
                 textTransform: 'none',
                 fontWeight: 600,
                 borderRadius: 2,

@@ -6,19 +6,23 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
 
 export default function Footer() {
   return (
-    <Box component="footer" sx={{ bgcolor: '#0D3A56', color: 'rgba(255,255,255,0.8)', pt: 6, pb: 3 }}>
+    <Box component="footer" sx={{ bgcolor: '#001a45', color: 'rgba(255,255,255,0.8)', pt: 6, pb: 3 }}>
       <Container maxWidth="lg">
         <Grid container spacing={4}>
           {/* Brand */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-              <PhoneIcon sx={{ fontSize: 28, color: '#F7941E' }} />
-              <Typography variant="h6" sx={{ fontWeight: 800, color: '#fff' }}>NumberDepot</Typography>
+            <Box sx={{ mb: 2 }}>
+              <Box
+                component="img"
+                src="/images/footer-logo.png"
+                alt="NumberDepot"
+                sx={{ height: 44, width: 'auto' }}
+              />
             </Box>
             <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.7, opacity: 0.75 }}>
               The premier marketplace to buy, sell, park, and forward phone numbers.

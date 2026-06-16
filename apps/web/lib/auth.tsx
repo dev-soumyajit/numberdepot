@@ -98,10 +98,9 @@ export const useAuth = create<AuthState>((set, get) => ({
   },
 }));
 
-/** Drop this component once in your Providers to auto-hydrate the auth store on  mount */
+/** Drop this component in your Providers to auto-hydrate the auth store on mount */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const hydrate = useAuth((s) => s._hydrate);
-
   useEffect(() => {
     hydrate();
   }, [hydrate]);

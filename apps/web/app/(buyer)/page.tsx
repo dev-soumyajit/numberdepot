@@ -58,9 +58,9 @@ function formatPhone(num: string): string {
 function getTypeColor(type: string): string {
   switch (type?.toLowerCase()) {
     case 'toll-free': return '#4BA0A1';
-    case 'vanity': return '#F7941E';
+    case 'vanity': return '#E53935';
     case 'local': return '#84BD00';
-    default: return '#144B6E';
+    default: return '#002664';
   }
 }
 
@@ -86,7 +86,7 @@ const plans = [
     price: '$19.99',
     period: '/mo',
     icon: <AllInclusiveIcon sx={{ fontSize: 40 }} />,
-    color: '#F7941E',
+    color: '#E53935',
     features: ['Unlimited calling', 'SMS messaging', 'Voicemail to email', 'All Forward features'],
     popular: true,
   },
@@ -95,19 +95,19 @@ const plans = [
     price: '$9.99',
     period: '/mo',
     icon: <BusinessIcon sx={{ fontSize: 40 }} />,
-    color: '#144B6E',
+    color: '#002664',
     features: ['Auto-attendant', 'Business hours routing', 'Call analytics', 'Professional greeting'],
   },
 ];
 
 const steps = [
   {
-    icon: <SearchIcon sx={{ fontSize: 48, color: '#144B6E' }} />,
+    icon: <SearchIcon sx={{ fontSize: 48, color: '#002664' }} />,
     title: 'Search',
     description: 'Browse thousands of local, toll-free, and vanity phone numbers. Filter by area code, type, or search for specific patterns.',
   },
   {
-    icon: <ShoppingCartIcon sx={{ fontSize: 48, color: '#F7941E' }} />,
+    icon: <ShoppingCartIcon sx={{ fontSize: 48, color: '#E53935' }} />,
     title: 'Choose a Plan',
     description: 'Select the perfect service plan for your needs. Park it, forward calls, or get full unlimited calling and messaging.',
   },
@@ -149,7 +149,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 30%, #1a5c7e 60%, #4BA0A1 100%)',
+          background: 'linear-gradient(135deg, #002664 0%, #001a45 30%, #1a4a8a 60%, #4BA0A1 100%)',
           color: '#fff',
           pt: { xs: 6, md: 10, lg: 12 },
           pb: { xs: 8, md: 12, lg: 14 },
@@ -178,7 +178,7 @@ export default function HomePage() {
             right: '-10%',
             width: '500px',
             height: '500px',
-            background: 'radial-gradient(circle, rgba(247,148,30,0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(229,57,53,0.15) 0%, transparent 70%)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -275,9 +275,9 @@ export default function HomePage() {
                     minWidth: 150,
                     fontSize: '1.05rem',
                     borderRadius: 2.5,
-                    boxShadow: '0 4px 20px rgba(247,148,30,0.4)',
+                    boxShadow: '0 4px 20px rgba(229,57,53,0.4)',
                     '&:hover': {
-                      boxShadow: '0 6px 28px rgba(247,148,30,0.5)',
+                      boxShadow: '0 6px 28px rgba(229,57,53,0.5)',
                     },
                   }}
                 >
@@ -308,9 +308,9 @@ export default function HomePage() {
             <Grid size={{ xs: 12, md: 5 }} sx={{ display: 'flex', justifyContent: 'center' }}>
               <Box
                 component="img"
-                src="/images/mascot.png"
-                alt="NumberDepot mascot"
-                className="animate-float mascot-img"
+                src="/images/elephant-01.png"
+                alt="NumberDepot elephant mascot"
+                className="animate-float"
                 sx={{
                   maxWidth: { xs: 340, md: 520, lg: 600 },
                   width: '100%',
@@ -344,8 +344,8 @@ export default function HomePage() {
             {stats.map((stat) => (
               <Grid key={stat.label} size={{ xs: 6, md: 3 }}>
                 <Box sx={{ textAlign: 'center' }}>
-                  <Box sx={{ color: '#F7941E', mb: 0.5 }}>{stat.icon}</Box>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#144B6E', fontSize: { xs: '1.5rem', md: '1.75rem' } }}>
+                  <Box sx={{ color: '#E53935', mb: 0.5 }}>{stat.icon}</Box>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#002664', fontSize: { xs: '1.5rem', md: '1.75rem' } }}>
                     {stat.value}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
@@ -365,8 +365,8 @@ export default function HomePage() {
             label="Featured"
             size="small"
             sx={{
-              bgcolor: '#F7941E18',
-              color: '#F7941E',
+              bgcolor: '#E5393518',
+              color: '#E53935',
               fontWeight: 700,
               mb: 2,
               fontSize: '0.8rem',
@@ -413,8 +413,8 @@ export default function HomePage() {
                           label="Premium"
                           size="small"
                           sx={{
-                            bgcolor: '#F7941E18',
-                            color: '#F7941E',
+                            bgcolor: '#E5393518',
+                            color: '#E53935',
                             fontWeight: 700,
                             fontSize: '0.7rem',
                             mb: 1.5,
@@ -491,8 +491,8 @@ export default function HomePage() {
               label="Simple Process"
               size="small"
               sx={{
-                bgcolor: '#144B6E18',
-                color: '#144B6E',
+                bgcolor: '#00266418',
+                color: '#002664',
                 fontWeight: 700,
                 mb: 2,
                 fontSize: '0.8rem',
@@ -528,7 +528,7 @@ export default function HomePage() {
                       width: 100,
                       height: 100,
                       borderRadius: '50%',
-                      bgcolor: i === 0 ? '#144B6E10' : i === 1 ? '#F7941E10' : '#84BD0010',
+                      bgcolor: i === 0 ? '#00266410' : i === 1 ? '#E5393510' : '#84BD0010',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -553,7 +553,7 @@ export default function HomePage() {
                         justifyContent: 'center',
                         fontWeight: 800,
                         fontSize: '0.85rem',
-                        boxShadow: '0 2px 8px rgba(20,75,110,0.3)',
+                        boxShadow: '0 2px 8px rgba(0,38,100,0.3)',
                       }}
                     >
                       {i + 1}
@@ -605,12 +605,26 @@ export default function HomePage() {
               >
                 Learn More About Us
               </Button>
+              <Box
+                component="img"
+                src="/images/elephant-02.png"
+                alt="NumberDepot elephant"
+                className="animate-float"
+                sx={{
+                  display: { xs: 'none', md: 'block' },
+                  maxWidth: 280,
+                  width: '100%',
+                  height: 'auto',
+                  mt: 4,
+                  filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.15))',
+                }}
+              />
             </Grid>
             <Grid size={{ xs: 12, md: 7 }} className="reveal-right">
               <Grid container spacing={2.5}>
                 {[
-                  { icon: <SecurityIcon sx={{ fontSize: 32, color: '#144B6E' }} />, title: 'Secure Transactions', desc: 'Every purchase is protected with bank-level encryption and Stripe payments.' },
-                  { icon: <SpeedIcon sx={{ fontSize: 32, color: '#F7941E' }} />, title: 'Instant Activation', desc: 'Your number is active within minutes of purchase. No waiting around.' },
+                  { icon: <SecurityIcon sx={{ fontSize: 32, color: '#002664' }} />, title: 'Secure Transactions', desc: 'Every purchase is protected with bank-level encryption and Stripe payments.' },
+                  { icon: <SpeedIcon sx={{ fontSize: 32, color: '#E53935' }} />, title: 'Instant Activation', desc: 'Your number is active within minutes of purchase. No waiting around.' },
                   { icon: <SupportAgentIcon sx={{ fontSize: 32, color: '#4BA0A1' }} />, title: '24/7 Support', desc: 'Our team is here to help whenever you need assistance with your number.' },
                   { icon: <CheckCircleIcon sx={{ fontSize: 32, color: '#84BD00' }} />, title: 'No Hidden Fees', desc: 'Transparent pricing with no surprise charges. What you see is what you pay.' },
                 ].map((item) => (
@@ -623,8 +637,8 @@ export default function HomePage() {
                         borderColor: 'divider',
                         transition: 'all 0.3s ease',
                         '&:hover': {
-                          borderColor: '#144B6E40',
-                          boxShadow: '0 8px 30px rgba(20,75,110,0.08)',
+                          borderColor: '#00266440',
+                          boxShadow: '0 8px 30px rgba(0,38,100,0.08)',
                         },
                       }}
                     >
@@ -693,7 +707,7 @@ export default function HomePage() {
                         bgcolor: plan.color,
                         color: '#fff',
                         fontWeight: 700,
-                        boxShadow: '0 4px 12px rgba(247,148,30,0.3)',
+                        boxShadow: '0 4px 12px rgba(229,57,53,0.3)',
                       }}
                     />
                   )}
@@ -748,7 +762,7 @@ export default function HomePage() {
       {/* CTA Section */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 40%, #4BA0A1 100%)',
+          background: 'linear-gradient(135deg, #002664 0%, #001a45 40%, #4BA0A1 100%)',
           py: { xs: 10, md: 14 },
           textAlign: 'center',
           position: 'relative',
@@ -764,7 +778,7 @@ export default function HomePage() {
             transform: 'translate(-50%, -50%)',
             width: '600px',
             height: '600px',
-            background: 'radial-gradient(circle, rgba(247,148,30,0.1) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(229,57,53,0.1) 0%, transparent 70%)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -772,9 +786,8 @@ export default function HomePage() {
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }} className="reveal-scale">
           <Box
             component="img"
-            src="/images/mascot.png"
-            alt="NumberDepot"
-            className="mascot-img"
+            src="/images/elephant-03.png"
+            alt="NumberDepot elephant"
             sx={{
               width: { xs: 120, md: 160 },
               height: 'auto',
@@ -816,9 +829,9 @@ export default function HomePage() {
                 py: 1.5,
                 fontSize: '1.1rem',
                 borderRadius: 3,
-                boxShadow: '0 4px 24px rgba(247,148,30,0.4)',
+                boxShadow: '0 4px 24px rgba(229,57,53,0.4)',
                 '&:hover': {
-                  boxShadow: '0 8px 32px rgba(247,148,30,0.5)',
+                  boxShadow: '0 8px 32px rgba(229,57,53,0.5)',
                 },
               }}
             >

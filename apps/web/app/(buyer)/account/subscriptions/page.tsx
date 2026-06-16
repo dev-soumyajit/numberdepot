@@ -69,9 +69,9 @@ function getPlanColor(plan: string): string {
   switch (plan) {
     case 'park': return '#4BA0A1';
     case 'forward': return '#84BD00';
-    case 'unlimited': return '#F7941E';
-    case 'business': return '#144B6E';
-    default: return '#144B6E';
+    case 'unlimited': return '#E53935';
+    case 'business': return '#002664';
+    default: return '#002664';
   }
 }
 
@@ -91,20 +91,20 @@ function getStatusColor(status: string): { bg: string; text: string } {
       return { bg: '#84BD0018', text: '#6B9A00' };
     case 'past_due':
     case 'suspended':
-      return { bg: '#F7941E18', text: '#E8850A' };
+      return { bg: '#E5393518', text: '#C62828' };
     case 'cancelled':
     case 'expired':
       return { bg: '#E74C3C18', text: '#E74C3C' };
     default:
-      return { bg: '#144B6E18', text: '#144B6E' };
+      return { bg: '#00266418', text: '#002664' };
   }
 }
 
 const planOptions = [
   { key: 'park', label: 'Park', price: 2.99, icon: <LocalParkingIcon />, color: '#4BA0A1' },
   { key: 'forward', label: 'Forward', price: 6.99, icon: <PhoneForwardedIcon />, color: '#84BD00' },
-  { key: 'unlimited', label: 'Unlimited', price: 19.99, icon: <AllInclusiveIcon />, color: '#F7941E' },
-  { key: 'business', label: 'Business', price: 9.99, icon: <BusinessIcon />, color: '#144B6E' },
+  { key: 'unlimited', label: 'Unlimited', price: 19.99, icon: <AllInclusiveIcon />, color: '#E53935' },
+  { key: 'business', label: 'Business', price: 9.99, icon: <BusinessIcon />, color: '#002664' },
 ];
 
 export default function SubscriptionsPage() {
@@ -187,7 +187,7 @@ export default function SubscriptionsPage() {
       {subscriptions.length > 0 && (
         <Grid container spacing={2} sx={{ mb: 4 }}>
           <Grid size={{ xs: 6 }}>
-            <Card sx={{ bgcolor: '#144B6E08', border: '1px solid #144B6E20' }}>
+            <Card sx={{ bgcolor: '#00266408', border: '1px solid #00266420' }}>
               <CardContent sx={{ textAlign: 'center', py: 2.5 }}>
                 <Typography variant="h4" color="primary.main" sx={{ fontWeight: 800 }}>
                   {activeCount}

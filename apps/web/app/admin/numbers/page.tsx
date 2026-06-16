@@ -153,8 +153,8 @@ export default function AdminNumbersPage() {
           startIcon={<AddIcon />}
           onClick={() => router.push('/admin/numbers/new')}
           sx={{
-            bgcolor: '#144B6E',
-            '&:hover': { bgcolor: '#0D3A56' },
+            bgcolor: '#002664',
+            '&:hover': { bgcolor: '#001a45' },
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
@@ -214,7 +214,7 @@ export default function AdminNumbersPage() {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                    <CircularProgress size={32} sx={{ color: '#144B6E' }} />
+                    <CircularProgress size={32} sx={{ color: '#002664' }} />
                   </TableCell>
                 </TableRow>
               ) : numbers.length === 0 ? (
@@ -236,8 +236,8 @@ export default function AdminNumbersPage() {
                         label={num.source}
                         size="small"
                         sx={{
-                          bgcolor: num.source === 'platform' ? '#144B6E14' : '#F7941E14',
-                          color: num.source === 'platform' ? '#144B6E' : '#F7941E',
+                          bgcolor: num.source === 'platform' ? '#00266414' : '#E5393514',
+                          color: num.source === 'platform' ? '#002664' : '#E53935',
                           fontWeight: 600,
                         }}
                       />
@@ -248,7 +248,7 @@ export default function AdminNumbersPage() {
                       <Chip label={num.status} size="small" color={getStatusColor(num.status) as any} />
                     </TableCell>
                     <TableCell align="right">
-                      <IconButton size="small" onClick={() => openEdit(num)} sx={{ color: '#144B6E' }}>
+                      <IconButton size="small" onClick={() => openEdit(num)} sx={{ color: '#002664' }}>
                         <EditIcon fontSize="small" />
                       </IconButton>
                       <IconButton size="small" onClick={() => setDeleteDialog(num)} sx={{ color: '#E74C3C' }}>
@@ -336,7 +336,7 @@ export default function AdminNumbersPage() {
             variant="contained"
             onClick={handleEdit}
             disabled={saving}
-            sx={{ bgcolor: '#144B6E', '&:hover': { bgcolor: '#0D3A56' } }}
+            sx={{ bgcolor: '#002664', '&:hover': { bgcolor: '#001a45' } }}
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>

@@ -47,7 +47,7 @@ interface Commission {
 type StatusFilter = 'all' | 'pending' | 'paid' | 'processing';
 
 const statusColors: Record<string, { bg: string; text: string }> = {
-  pending: { bg: '#F7941E20', text: '#E8850A' },
+  pending: { bg: '#E5393520', text: '#C62828' },
   paid: { bg: '#84BD0020', text: '#6B9A00' },
   processing: { bg: '#4BA0A120', text: '#4BA0A1' },
   cancelled: { bg: '#E74C3C20', text: '#E74C3C' },
@@ -62,9 +62,9 @@ function formatDate(d: string): string {
 }
 
 const summaryCards = [
-  { key: 'allTimeEarnings', label: 'All-Time Earnings', icon: AccountBalanceWalletIcon, color: '#144B6E' },
+  { key: 'allTimeEarnings', label: 'All-Time Earnings', icon: AccountBalanceWalletIcon, color: '#002664' },
   { key: 'thisMonthEarnings', label: 'This Month', icon: CalendarMonthIcon, color: '#84BD00' },
-  { key: 'lastMonthEarnings', label: 'Last Month', icon: HistoryIcon, color: '#F7941E' },
+  { key: 'lastMonthEarnings', label: 'Last Month', icon: HistoryIcon, color: '#E53935' },
   { key: 'availableBalance', label: 'Available Balance', icon: SavingsIcon, color: '#4BA0A1' },
 ] as const;
 
@@ -102,7 +102,7 @@ export default function EarningsPage() {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700 }}>
+        <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700 }}>
           Earnings
         </Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
@@ -167,7 +167,7 @@ export default function EarningsPage() {
       <Card>
         <CardContent sx={{ p: 0 }}>
           <Box sx={{ p: 3, pb: 2 }}>
-            <Typography variant="h5" sx={{ color: '#144B6E', fontWeight: 600 }}>
+            <Typography variant="h5" sx={{ color: '#002664', fontWeight: 600 }}>
               Commission History
             </Typography>
           </Box>
@@ -211,7 +211,7 @@ export default function EarningsPage() {
                           <Chip
                             label={`${(c.commissionRate * 100).toFixed(0)}%`}
                             size="small"
-                            sx={{ bgcolor: '#144B6E10', color: '#144B6E', fontWeight: 700, fontSize: '0.75rem' }}
+                            sx={{ bgcolor: '#00266410', color: '#002664', fontWeight: 700, fontSize: '0.75rem' }}
                           />
                         </TableCell>
                         <TableCell sx={{ fontWeight: 700, color: '#84BD00' }}>

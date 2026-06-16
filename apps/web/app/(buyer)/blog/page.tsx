@@ -48,7 +48,7 @@ const posts = [
 ];
 
 const categoryColors: Record<string, string> = {
-  Tips: '#F7941E',
+  Tips: '#E53935',
   Guide: '#4BA0A1',
   Features: '#84BD00',
 };
@@ -56,7 +56,7 @@ const categoryColors: Record<string, string> = {
 export default function BlogPage() {
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '80vh' }}>
-      <Box sx={{ background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)', py: 5, color: '#fff' }}>
+      <Box sx={{ background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)', py: 5, color: '#fff' }}>
         <Container maxWidth="lg">
           <Typography variant="h3" sx={{ fontWeight: 800, textAlign: 'center' }}>
             Blog
@@ -85,8 +85,8 @@ export default function BlogPage() {
                       label={post.category}
                       size="small"
                       sx={{
-                        bgcolor: (categoryColors[post.category] || '#144B6E') + '18',
-                        color: categoryColors[post.category] || '#144B6E',
+                        bgcolor: (categoryColors[post.category] || '#002664') + '18',
+                        color: categoryColors[post.category] || '#002664',
                         fontWeight: 700,
                       }}
                     />

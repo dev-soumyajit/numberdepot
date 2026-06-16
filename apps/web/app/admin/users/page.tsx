@@ -108,7 +108,7 @@ export default function AdminUsersPage() {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin':
-      case 'super_admin': return { bgcolor: '#144B6E14', color: '#144B6E' };
+      case 'super_admin': return { bgcolor: '#00266414', color: '#002664' };
       case 'seller': return { bgcolor: '#84BD0014', color: '#84BD00' };
       case 'buyer': return { bgcolor: '#4BA0A114', color: '#4BA0A1' };
       default: return { bgcolor: '#eee', color: '#666' };
@@ -209,7 +209,7 @@ export default function AdminUsersPage() {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                    <CircularProgress size={32} sx={{ color: '#144B6E' }} />
+                    <CircularProgress size={32} sx={{ color: '#002664' }} />
                   </TableCell>
                 </TableRow>
               ) : users.length === 0 ? (
@@ -228,7 +228,7 @@ export default function AdminUsersPage() {
                             width: 36,
                             height: 36,
                             borderRadius: '50%',
-                            bgcolor: '#144B6E',
+                            bgcolor: '#002664',
                             color: '#fff',
                             display: 'flex',
                             alignItems: 'center',

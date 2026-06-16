@@ -59,7 +59,7 @@ const plans = [
     title: 'Unlimited',
     price: 19.99,
     icon: <AllInclusiveIcon sx={{ fontSize: 44 }} />,
-    color: '#F7941E',
+    color: '#E53935',
     popular: true,
     description: 'Full communication suite with unlimited calling, SMS, and voicemail transcription.',
     features: [
@@ -76,7 +76,7 @@ const plans = [
     title: 'Business',
     price: 9.99,
     icon: <BusinessIcon sx={{ fontSize: 44 }} />,
-    color: '#144B6E',
+    color: '#002664',
     description: 'Professional features for businesses including auto-attendant, call routing, and analytics.',
     features: [
       'Everything in Park',
@@ -121,7 +121,7 @@ export default function PricingPage() {
       {/* Header */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)',
+          background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)',
           py: { xs: 8, md: 10 },
           textAlign: 'center',
           color: '#fff',
@@ -136,7 +136,7 @@ export default function PricingPage() {
             right: '-15%',
             width: '400px',
             height: '400px',
-            background: 'radial-gradient(circle, rgba(247,148,30,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(229,57,53,0.12) 0%, transparent 70%)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -255,15 +255,15 @@ export default function PricingPage() {
           sx={{
             mt: 4,
             p: 3,
-            bgcolor: '#F7941E08',
-            border: '1px solid #F7941E30',
+            bgcolor: '#E5393508',
+            border: '1px solid #E5393530',
             borderRadius: 2,
             display: 'flex',
             alignItems: 'center',
             gap: 2,
           }}
         >
-          <InfoOutlinedIcon sx={{ color: '#F7941E', fontSize: 28, flexShrink: 0 }} />
+          <InfoOutlinedIcon sx={{ color: '#E53935', fontSize: 28, flexShrink: 0 }} />
           <Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               One-Time Setup Fee: $5.00
@@ -307,7 +307,7 @@ export default function PricingPage() {
                       color: '#fff',
                       fontWeight: 700,
                       fontSize: '0.95rem',
-                      bgcolor: '#F7941E',
+                      bgcolor: '#E53935',
                     }}
                   >
                     Unlimited<br />
@@ -332,7 +332,7 @@ export default function PricingPage() {
                     <TableCell sx={{ fontWeight: 600 }}>{feature.label}</TableCell>
                     <TableCell align="center"><FeatureCheck included={feature.park} /></TableCell>
                     <TableCell align="center"><FeatureCheck included={feature.forward} /></TableCell>
-                    <TableCell align="center" sx={{ bgcolor: '#F7941E06' }}>
+                    <TableCell align="center" sx={{ bgcolor: '#E5393506' }}>
                       <FeatureCheck included={feature.unlimited} />
                     </TableCell>
                     <TableCell align="center"><FeatureCheck included={feature.business} /></TableCell>
@@ -347,6 +347,18 @@ export default function PricingPage() {
       {/* CTA */}
       <Box sx={{ py: { xs: 6, md: 8 }, textAlign: 'center' }}>
         <Container maxWidth="sm">
+          <Box
+            component="img"
+            src="/images/elephant-01.png"
+            alt="NumberDepot elephant"
+            sx={{
+              width: { xs: 110, md: 150 },
+              height: 'auto',
+              mx: 'auto',
+              mb: 3,
+              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.12))',
+            }}
+          />
           <Typography variant="h3" sx={{ mb: 2 }}>
             Ready to Get Started?
           </Typography>

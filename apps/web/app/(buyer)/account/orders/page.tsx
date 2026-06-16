@@ -41,14 +41,14 @@ function getStatusColor(status: string): { bg: string; text: string } {
       return { bg: '#84BD0018', text: '#6B9A00' };
     case 'pending':
     case 'processing':
-      return { bg: '#F7941E18', text: '#E8850A' };
+      return { bg: '#E5393518', text: '#C62828' };
     case 'cancelled':
     case 'failed':
       return { bg: '#E74C3C18', text: '#E74C3C' };
     case 'refunded':
       return { bg: '#4BA0A118', text: '#4BA0A1' };
     default:
-      return { bg: '#144B6E18', text: '#144B6E' };
+      return { bg: '#00266418', text: '#002664' };
   }
 }
 

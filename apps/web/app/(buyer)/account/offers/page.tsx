@@ -48,7 +48,7 @@ interface Offer {
 }
 
 const statusColors: Record<string, { bg: string; text: string }> = {
-  pending: { bg: '#F7941E20', text: '#E8850A' },
+  pending: { bg: '#E5393520', text: '#C62828' },
   accepted: { bg: '#84BD0020', text: '#6B9A00' },
   declined: { bg: '#E74C3C20', text: '#E74C3C' },
   countered: { bg: '#4BA0A120', text: '#4BA0A1' },
@@ -165,7 +165,7 @@ export default function BuyerOffersPage() {
                               : '--'}
                         </TableCell>
                         <TableCell>
-                          <Typography sx={{ fontWeight: 700, color: '#144B6E' }}>
+                          <Typography sx={{ fontWeight: 700, color: '#002664' }}>
                             {formatCurrency(offer.amount)}
                           </Typography>
                         </TableCell>

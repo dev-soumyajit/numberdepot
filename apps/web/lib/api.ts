@@ -546,6 +546,42 @@ async function handleRoute(method: string, endpoint: string, body?: any): Promis
   return ok(null);
 }
 
+// ── Real API call (for auth endpoints) ──────────────────────────────────────
+
+const REAL_AUTH_ENDPOINTS = ['/auth/login', '/auth/register', '/auth/verify-otp', '/auth/resend-otp', '/auth/forgot-password', '/auth/reset-password', '/auth/logout', '/users/me'];
+
+function isRealAuthEndpoint(endpoint: string): boolean {
+  const path = endpoint.split('?')[0];
+  return REAL_AUTH_ENDPOINTS.some((e) => path === e);
+}
+
+async function realApiCall<T>(method: string, endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(`/api${endpoint}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new ApiError(data.error || 'Request failed', res.status, data);
+  }
+
+  // Normalize response shape for auth endpoints
+  if (endpoint === '/auth/login' && data.token) {
+    return { success: true, data: { user: data.user, token: data.token, refreshToken: `refresh_${data.token}` } as T };
+  }
+  if (endpoint === '/users/me' && data.user) {
+    return { success: true, data: data.user as T };
+  }
+  return { success: true, data: data as T };
+}
+
 // ── Public API (same interface as original) ─────────────────────────────────
 
 interface ApiOptions extends RequestInit {
@@ -558,6 +594,21 @@ async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<A
   if (options.body && typeof options.body === 'string') {
     try { body = JSON.parse(options.body); } catch { body = options.body; }
   }
+
+  // Route auth endpoints to real API, fall back to mock on failure
+  if (isRealAuthEndpoint(endpoint)) {
+    try {
+      return await realApiCall<T>(method, endpoint, body);
+    } catch (err) {
+      // If it's a clear auth error (401, 403, 409), don't fall back to mock
+      if (err instanceof ApiError && err.status < 500) {
+        throw err;
+      }
+      // Server error (MongoDB not configured, etc.) — fall back to mock
+      console.warn('[API] Real auth failed, falling back to mock:', (err as Error).message);
+    }
+  }
+
   return handleRoute(method, endpoint, body) as Promise<ApiResponse<T>>;
 }
 

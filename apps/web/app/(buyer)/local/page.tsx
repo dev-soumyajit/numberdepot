@@ -65,7 +65,7 @@ export default function LocalNumbersPage() {
   return (
     <Box>
       {/* Hero */}
-      <Box sx={{ background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)', color: '#fff', py: { xs: 6, md: 10 } }}>
+      <Box sx={{ background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)', color: '#fff', py: { xs: 6, md: 10 } }}>
         <Container maxWidth="lg">
           <Typography variant="h3" sx={{ fontWeight: 900, mb: 2 }}>Local Phone Numbers</Typography>
           <Typography variant="h6" sx={{ opacity: 0.85, maxWidth: 600, mb: 4, fontWeight: 400 }}>

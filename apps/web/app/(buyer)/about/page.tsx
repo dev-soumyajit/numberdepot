@@ -37,7 +37,7 @@ const values = [
     icon: <SpeedIcon sx={{ fontSize: 40 }} />,
     title: 'Simplicity',
     description: 'We believe getting a phone number should be as easy as ordering a pizza. Our platform is designed to be intuitive, fast, and hassle-free.',
-    color: '#F7941E',
+    color: '#E53935',
   },
   {
     icon: <SecurityIcon sx={{ fontSize: 40 }} />,
@@ -49,7 +49,7 @@ const values = [
     icon: <HandshakeIcon sx={{ fontSize: 40 }} />,
     title: 'Fair Marketplace',
     description: 'We provide a fair and open marketplace where buyers and sellers can transact with confidence. Every listing is verified for quality and compliance.',
-    color: '#144B6E',
+    color: '#002664',
   },
 ];
 
@@ -61,7 +61,7 @@ export default function AboutPage() {
       {/* Hero */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 40%, #4BA0A1 100%)',
+          background: 'linear-gradient(135deg, #002664 0%, #001a45 40%, #4BA0A1 100%)',
           py: { xs: 10, md: 14 },
           color: '#fff',
           textAlign: 'center',
@@ -76,7 +76,7 @@ export default function AboutPage() {
             right: '-10%',
             width: '400px',
             height: '400px',
-            background: 'radial-gradient(circle, rgba(247,148,30,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(229,57,53,0.12) 0%, transparent 70%)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -111,8 +111,8 @@ export default function AboutPage() {
               label="Our Story"
               size="small"
               sx={{
-                bgcolor: '#F7941E18',
-                color: '#F7941E',
+                bgcolor: '#E5393518',
+                color: '#E53935',
                 fontWeight: 700,
                 mb: 2,
                 fontSize: '0.8rem',
@@ -142,9 +142,9 @@ export default function AboutPage() {
           <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', justifyContent: 'center' }} className="reveal-right">
             <Box
               component="img"
-              src="/images/mascot.png"
-              alt="Ellie - NumberDepot mascot, a friendly elephant in a teal hoodie"
-              className="animate-float mascot-img"
+              src="/images/elephant-02.png"
+              alt="NumberDepot elephant mascot"
+              className="animate-float"
               sx={{
                 maxWidth: { xs: 340, md: 480, lg: 540 },
                 width: '100%',
@@ -184,8 +184,8 @@ export default function AboutPage() {
             label="What We Believe"
             size="small"
             sx={{
-              bgcolor: '#144B6E18',
-              color: '#144B6E',
+              bgcolor: '#00266418',
+              color: '#002664',
               fontWeight: 700,
               mb: 2,
               fontSize: '0.8rem',
@@ -234,7 +234,7 @@ export default function AboutPage() {
       {/* CTA */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #0D3A56 0%, #144B6E 50%, #4BA0A1 100%)',
+          background: 'linear-gradient(135deg, #001a45 0%, #002664 50%, #4BA0A1 100%)',
           py: { xs: 10, md: 14 },
           textAlign: 'center',
           color: '#fff',
@@ -250,7 +250,7 @@ export default function AboutPage() {
             transform: 'translate(-50%, -50%)',
             width: '500px',
             height: '500px',
-            background: 'radial-gradient(circle, rgba(247,148,30,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(229,57,53,0.08) 0%, transparent 70%)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -275,7 +275,7 @@ export default function AboutPage() {
                 py: 1.5,
                 borderRadius: 3,
                 fontSize: '1.05rem',
-                boxShadow: '0 4px 24px rgba(247,148,30,0.4)',
+                boxShadow: '0 4px 24px rgba(229,57,53,0.4)',
               }}
             >
               Browse Numbers

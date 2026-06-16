@@ -86,7 +86,7 @@ const planDetails = [
     label: 'Unlimited',
     price: 19.99,
     icon: <AllInclusiveIcon />,
-    color: '#F7941E',
+    color: '#E53935',
     description: 'Full calling and SMS capabilities with voicemail to email.',
     features: ['Unlimited calling', 'SMS messaging', 'Voicemail to email', 'All Forward features'],
   },
@@ -95,7 +95,7 @@ const planDetails = [
     label: 'Business',
     price: 9.99,
     icon: <BusinessIcon />,
-    color: '#144B6E',
+    color: '#002664',
     description: 'Professional features including auto-attendant and call analytics.',
     features: ['Auto-attendant', 'Business hours routing', 'Call analytics', 'Professional greeting'],
   },
@@ -115,9 +115,9 @@ function formatPhone(num: string): string {
 function getTypeColor(type: string): string {
   switch (type?.toLowerCase()) {
     case 'toll-free': return '#4BA0A1';
-    case 'vanity': return '#F7941E';
+    case 'vanity': return '#E53935';
     case 'local': return '#84BD00';
-    default: return '#144B6E';
+    default: return '#002664';
   }
 }
 
@@ -280,7 +280,7 @@ export default function NumberDetailPage() {
                   <Chip
                     icon={<StarIcon sx={{ fontSize: 16 }} />}
                     label="Premium"
-                    sx={{ bgcolor: '#F7941E18', color: '#F7941E', fontWeight: 700 }}
+                    sx={{ bgcolor: '#E5393518', color: '#E53935', fontWeight: 700 }}
                   />
                 )}
                 {number.isPortable && (

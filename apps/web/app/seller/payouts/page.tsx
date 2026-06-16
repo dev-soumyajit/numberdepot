@@ -44,7 +44,7 @@ interface Payout {
 }
 
 const statusColors: Record<string, { bg: string; text: string }> = {
-  pending: { bg: '#F7941E20', text: '#E8850A' },
+  pending: { bg: '#E5393520', text: '#C62828' },
   processing: { bg: '#4BA0A120', text: '#4BA0A1' },
   completed: { bg: '#84BD0020', text: '#6B9A00' },
   failed: { bg: '#E74C3C20', text: '#E74C3C' },
@@ -114,7 +114,7 @@ export default function PayoutsPage() {
     <Box>
       <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700 }}>
+          <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700 }}>
             Payouts
           </Typography>
           <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
@@ -150,14 +150,14 @@ export default function PayoutsPage() {
           </Card>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <Card sx={{ borderLeft: '4px solid #F7941E' }}>
+          <Card sx={{ borderLeft: '4px solid #E53935' }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                <HourglassEmptyIcon sx={{ color: '#F7941E', fontSize: 22 }} />
+                <HourglassEmptyIcon sx={{ color: '#E53935', fontSize: 22 }} />
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Pending Balance</Typography>
               </Box>
               {loading ? <Skeleton width={120} height={40} /> : (
-                <Typography variant="h3" sx={{ fontWeight: 700, color: '#F7941E' }}>
+                <Typography variant="h3" sx={{ fontWeight: 700, color: '#E53935' }}>
                   {formatCurrency(balance?.pendingBalance ?? 0)}
                 </Typography>
               )}
@@ -191,7 +191,7 @@ export default function PayoutsPage() {
       <Card>
         <CardContent sx={{ p: 0 }}>
           <Box sx={{ p: 3, pb: 2 }}>
-            <Typography variant="h5" sx={{ color: '#144B6E', fontWeight: 600 }}>
+            <Typography variant="h5" sx={{ color: '#002664', fontWeight: 600 }}>
               Payout History
             </Typography>
           </Box>
@@ -222,7 +222,7 @@ export default function PayoutsPage() {
                     const sc = statusColors[payout.status] || statusColors.cancelled;
                     return (
                       <TableRow key={payout.id} hover>
-                        <TableCell sx={{ fontWeight: 700, color: '#144B6E', fontSize: '1rem' }}>
+                        <TableCell sx={{ fontWeight: 700, color: '#002664', fontSize: '1rem' }}>
                           {formatCurrency(payout.amount)}
                         </TableCell>
                         <TableCell sx={{ textTransform: 'capitalize' }}>{payout.method}</TableCell>
@@ -272,7 +272,7 @@ export default function PayoutsPage() {
             <strong style={{ color: '#4BA0A1' }}>{formatCurrency(balance?.availableBalance ?? 0)}</strong>{' '}
             will be transferred to your registered bank account.
           </DialogContentText>
-          <Alert severity="info" sx={{ bgcolor: '#144B6E08' }}>
+          <Alert severity="info" sx={{ bgcolor: '#00266408' }}>
             Payouts typically take 3-5 business days to process. You will receive a confirmation email once the transfer is initiated.
           </Alert>
         </DialogContent>

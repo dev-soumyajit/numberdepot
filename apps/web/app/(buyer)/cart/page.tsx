@@ -48,9 +48,9 @@ function getPlanColor(plan: string): string {
   switch (plan) {
     case 'park': return '#4BA0A1';
     case 'forward': return '#84BD00';
-    case 'unlimited': return '#F7941E';
-    case 'business': return '#144B6E';
-    default: return '#144B6E';
+    case 'unlimited': return '#E53935';
+    case 'business': return '#002664';
+    default: return '#002664';
   }
 }
 

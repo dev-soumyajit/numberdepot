@@ -63,7 +63,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     <Box sx={{ bgcolor: 'background.default', minHeight: '80vh' }}>
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)',
+          background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)',
           py: { xs: 3, md: 4 },
           color: '#fff',
         }}

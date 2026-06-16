@@ -61,8 +61,8 @@ type StatusFilter = 'all' | 'active' | 'sold' | 'pending' | 'inactive';
 
 const statusColors: Record<string, { bg: string; text: string }> = {
   active: { bg: '#84BD0020', text: '#6B9A00' },
-  sold: { bg: '#144B6E20', text: '#144B6E' },
-  pending: { bg: '#F7941E20', text: '#E8850A' },
+  sold: { bg: '#00266420', text: '#002664' },
+  pending: { bg: '#E5393520', text: '#C62828' },
   inactive: { bg: '#E0E6ED', text: '#535E66' },
   delisted: { bg: '#E74C3C20', text: '#E74C3C' },
 };
@@ -137,7 +137,7 @@ export default function InventoryPage() {
     <Box>
       <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700 }}>
+          <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700 }}>
             My Numbers
           </Typography>
           <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
@@ -225,7 +225,7 @@ export default function InventoryPage() {
                           {num.number}
                         </Typography>
                         {num.vanityText && (
-                          <Typography variant="caption" sx={{ color: '#F7941E', fontWeight: 600 }}>
+                          <Typography variant="caption" sx={{ color: '#E53935', fontWeight: 600 }}>
                             {num.vanityText}
                           </Typography>
                         )}
@@ -247,10 +247,10 @@ export default function InventoryPage() {
                       <TableCell>
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
                           {num.isVanity && (
-                            <Chip label="Vanity" size="small" sx={{ bgcolor: '#F7941E20', color: '#E8850A', fontSize: '0.7rem' }} />
+                            <Chip label="Vanity" size="small" sx={{ bgcolor: '#E5393520', color: '#C62828', fontSize: '0.7rem' }} />
                           )}
                           {num.isPremium && (
-                            <Chip label="Premium" size="small" sx={{ bgcolor: '#144B6E20', color: '#144B6E', fontSize: '0.7rem' }} />
+                            <Chip label="Premium" size="small" sx={{ bgcolor: '#00266420', color: '#002664', fontSize: '0.7rem' }} />
                           )}
                           {num.isPortable && (
                             <Chip label="Portable" size="small" sx={{ bgcolor: '#4BA0A120', color: '#4BA0A1', fontSize: '0.7rem' }} />

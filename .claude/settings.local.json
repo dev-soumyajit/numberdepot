@@ -12,7 +12,9 @@
       "Bash(ls:*)",
       "Bash(NEXT_PUBLIC_API_URL=http://localhost:5000 npx next build:*)",
       "WebSearch",
-      "WebFetch(domain:www.numberbarn.com)"
+      "WebFetch(domain:www.numberbarn.com)",
+      "WebFetch(domain:static.demoviewer4.com)",
+      "Bash(curl:*)"
     ]
   }
 }

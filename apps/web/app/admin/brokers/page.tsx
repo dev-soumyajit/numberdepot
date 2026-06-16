@@ -133,7 +133,7 @@ export default function AdminBrokersPage() {
       {/* Applications */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress sx={{ color: '#144B6E' }} />
+          <CircularProgress sx={{ color: '#002664' }} />
         </Box>
       ) : applications.length === 0 ? (
         <Card sx={{ borderRadius: 3, border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>

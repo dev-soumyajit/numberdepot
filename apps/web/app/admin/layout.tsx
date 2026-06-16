@@ -50,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <CircularProgress sx={{ color: '#144B6E' }} />
+        <CircularProgress sx={{ color: '#002664' }} />
       </div>
     );
   }
@@ -79,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.logo}>
-          <img src="/images/mascot.png" alt="NumberDepot" className={styles.logoImg} />
+          <img src="/images/logo.png" alt="NumberDepot" className={styles.logoImg} />
           <div>
             <div className={styles.logoText}>NumberDepot</div>
             <span className={styles.logoSub}>Admin Panel</span>

@@ -111,14 +111,14 @@ export default function FAQPage() {
       {/* Header */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)',
+          background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)',
           py: { xs: 6, md: 8 },
           textAlign: 'center',
           color: '#fff',
         }}
       >
         <Container maxWidth="md">
-          <HelpOutlineIcon sx={{ fontSize: 48, color: '#F7941E', mb: 2 }} />
+          <HelpOutlineIcon sx={{ fontSize: 48, color: '#E53935', mb: 2 }} />
           <Typography variant="h2" sx={{ mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' }, color: '#fff' }}>
             Frequently Asked Questions
           </Typography>
@@ -258,6 +258,18 @@ export default function FAQPage() {
       {/* Contact CTA */}
       <Box sx={{ bgcolor: 'background.paper', py: { xs: 6, md: 8 }, textAlign: 'center' }}>
         <Container maxWidth="sm">
+          <Box
+            component="img"
+            src="/images/elephant-03.png"
+            alt="NumberDepot elephant"
+            sx={{
+              width: { xs: 100, md: 130 },
+              height: 'auto',
+              mx: 'auto',
+              mb: 3,
+              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.12))',
+            }}
+          />
           <Typography variant="h4" sx={{ mb: 2 }}>
             Still have questions?
           </Typography>

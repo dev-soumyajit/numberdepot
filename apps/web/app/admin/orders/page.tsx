@@ -232,7 +232,7 @@ export default function AdminOrdersPage() {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
-                    <CircularProgress size={32} sx={{ color: '#144B6E' }} />
+                    <CircularProgress size={32} sx={{ color: '#002664' }} />
                   </TableCell>
                 </TableRow>
               ) : orders.length === 0 ? (

@@ -82,7 +82,7 @@ export default function VanityPage() {
                 { stat: '75%', desc: 'of businesses report increased inquiries' },
               ].map((item) => (
                 <Box key={item.desc} sx={{ display: 'flex', alignItems: 'baseline', gap: 2, mb: 2 }}>
-                  <Typography variant="h5" sx={{ fontWeight: 900, color: '#F7941E', minWidth: 60 }}>{item.stat}</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 900, color: '#E53935', minWidth: 60 }}>{item.stat}</Typography>
                   <Typography variant="body1">{item.desc}</Typography>
                 </Box>
               ))}

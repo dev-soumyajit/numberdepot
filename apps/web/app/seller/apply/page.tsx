@@ -111,7 +111,7 @@ export default function BrokerApplyPage() {
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', py: 6, bgcolor: 'background.paper' }}>
       <Container maxWidth="sm">
         <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <StorefrontIcon sx={{ fontSize: 56, color: '#F7941E', mb: 1 }} />
+          <StorefrontIcon sx={{ fontSize: 56, color: '#E53935', mb: 1 }} />
           <Typography variant="h3" sx={{ mb: 1 }}>Become a Seller</Typography>
           <Typography variant="body1" color="text.secondary">
             Apply to sell phone numbers on NumberDepot marketplace

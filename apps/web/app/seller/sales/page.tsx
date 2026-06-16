@@ -39,7 +39,7 @@ interface Sale {
 
 const statusColors: Record<string, { bg: string; text: string }> = {
   completed: { bg: '#84BD0020', text: '#6B9A00' },
-  pending: { bg: '#F7941E20', text: '#E8850A' },
+  pending: { bg: '#E5393520', text: '#C62828' },
   processing: { bg: '#4BA0A120', text: '#4BA0A1' },
   refunded: { bg: '#E74C3C20', text: '#E74C3C' },
   cancelled: { bg: '#E0E6ED', text: '#535E66' },
@@ -90,7 +90,7 @@ export default function SalesPage() {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700 }}>
+        <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700 }}>
           Sales History
         </Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
@@ -104,11 +104,11 @@ export default function SalesPage() {
           <Card>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                <ShoppingCartIcon sx={{ color: '#144B6E', fontSize: 22 }} />
+                <ShoppingCartIcon sx={{ color: '#002664', fontSize: 22 }} />
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Total Sales</Typography>
               </Box>
               {loading ? <Skeleton width={80} height={36} /> : (
-                <Typography variant="h4" sx={{ fontWeight: 700, color: '#144B6E' }}>{sales.length}</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: '#002664' }}>{sales.length}</Typography>
               )}
             </CardContent>
           </Card>
@@ -130,11 +130,11 @@ export default function SalesPage() {
           <Card>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                <TrendingUpIcon sx={{ color: '#F7941E', fontSize: 22 }} />
+                <TrendingUpIcon sx={{ color: '#E53935', fontSize: 22 }} />
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Total Commission</Typography>
               </Box>
               {loading ? <Skeleton width={100} height={36} /> : (
-                <Typography variant="h4" sx={{ fontWeight: 700, color: '#F7941E' }}>{formatCurrency(totalCommission)}</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: '#E53935' }}>{formatCurrency(totalCommission)}</Typography>
               )}
             </CardContent>
           </Card>
@@ -217,10 +217,10 @@ export default function SalesPage() {
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>{sale.buyerEmail}</Typography>
                       </TableCell>
                       <TableCell>
-                        <Chip label={sale.type} size="small" sx={{ textTransform: 'capitalize', bgcolor: '#144B6E10', color: '#144B6E', fontWeight: 600, fontSize: '0.75rem' }} />
+                        <Chip label={sale.type} size="small" sx={{ textTransform: 'capitalize', bgcolor: '#00266410', color: '#002664', fontWeight: 600, fontSize: '0.75rem' }} />
                       </TableCell>
                       <TableCell sx={{ fontWeight: 600 }}>{formatCurrency(sale.amount)}</TableCell>
-                      <TableCell sx={{ color: '#F7941E', fontWeight: 600 }}>{formatCurrency(sale.commission)}</TableCell>
+                      <TableCell sx={{ color: '#E53935', fontWeight: 600 }}>{formatCurrency(sale.commission)}</TableCell>
                       <TableCell sx={{ color: '#84BD00', fontWeight: 700 }}>{formatCurrency(sale.netAmount)}</TableCell>
                       <TableCell>{formatDate(sale.createdAt)}</TableCell>
                       <TableCell>

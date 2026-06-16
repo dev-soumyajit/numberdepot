@@ -101,13 +101,13 @@ export default function AdminCommissionsPage() {
       label: 'Total Commissions',
       value: summary?.totalCommissions,
       icon: <TrendingUpIcon />,
-      color: '#144B6E',
+      color: '#002664',
     },
     {
       label: 'Pending Payouts',
       value: summary?.pendingCommissions,
       icon: <PendingActionsIcon />,
-      color: '#F7941E',
+      color: '#E53935',
     },
     {
       label: 'Paid Out',
@@ -218,7 +218,7 @@ export default function AdminCommissionsPage() {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
-                    <CircularProgress size={32} sx={{ color: '#144B6E' }} />
+                    <CircularProgress size={32} sx={{ color: '#002664' }} />
                   </TableCell>
                 </TableRow>
               ) : commissions.length === 0 ? (

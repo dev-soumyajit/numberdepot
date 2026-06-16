@@ -205,7 +205,7 @@ export default function EditNumberPage() {
         <Typography color="text.primary" sx={{ fontWeight: 600 }}>Edit Number</Typography>
       </Breadcrumbs>
 
-      <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700, mb: 1 }}>
+      <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700, mb: 1 }}>
         Edit Number
       </Typography>
       <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4 }}>
@@ -216,7 +216,7 @@ export default function EditNumberPage() {
         {/* Phone Number Details */}
         <Card sx={{ mb: 3 }}>
           <CardContent sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ color: '#144B6E', fontWeight: 600, mb: 3 }}>
+            <Typography variant="h5" sx={{ color: '#002664', fontWeight: 600, mb: 3 }}>
               Number Details
             </Typography>
             <Grid container spacing={3}>
@@ -312,7 +312,7 @@ export default function EditNumberPage() {
                 label="Vanity Number"
               />
               <FormControlLabel
-                control={<Switch checked={form.isPremium} onChange={handleChange('isPremium')} sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#144B6E' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#144B6E' } }} />}
+                control={<Switch checked={form.isPremium} onChange={handleChange('isPremium')} sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#002664' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#002664' } }} />}
                 label="Premium Number"
               />
               <FormControlLabel
@@ -326,7 +326,7 @@ export default function EditNumberPage() {
         {/* Pricing & Listing */}
         <Card sx={{ mb: 3 }}>
           <CardContent sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ color: '#144B6E', fontWeight: 600, mb: 3 }}>
+            <Typography variant="h5" sx={{ color: '#002664', fontWeight: 600, mb: 3 }}>
               Pricing & Listing
             </Typography>
             <Grid container spacing={3}>

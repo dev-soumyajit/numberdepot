@@ -5,15 +5,15 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#144B6E',
-      light: '#3C7497',
-      dark: '#0D3A56',
+      main: '#002664',
+      light: '#1a4a8a',
+      dark: '#001a45',
       contrastText: '#fff',
     },
     secondary: {
-      main: '#F7941E',
-      light: '#FFB347',
-      dark: '#E8850A',
+      main: '#E53935',
+      light: '#EF5350',
+      dark: '#C62828',
       contrastText: '#fff',
     },
     success: {
@@ -62,15 +62,15 @@ const theme = createTheme({
           boxShadow: 'none',
           '&:hover': { boxShadow: 'none' },
           '&.MuiButton-containedPrimary': {
-            background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)',
+            background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #3C7497 0%, #144B6E 100%)',
+              background: 'linear-gradient(135deg, #1a4a8a 0%, #002664 100%)',
             },
           },
           '&.MuiButton-containedSecondary': {
-            background: 'linear-gradient(135deg, #F7941E 0%, #E8850A 100%)',
+            background: 'linear-gradient(135deg, #E53935 0%, #C62828 100%)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #E8850A 0%, #d97600 100%)',
+              background: 'linear-gradient(135deg, #C62828 0%, #B71C1C 100%)',
             },
           },
         },

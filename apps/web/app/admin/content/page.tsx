@@ -31,14 +31,14 @@ const contentSections = [
     title: 'Blog Posts',
     description: 'Create and manage blog posts for the company blog.',
     icon: <ArticleIcon sx={{ fontSize: 40 }} />,
-    color: '#F7941E',
+    color: '#E53935',
     href: '/blog',
   },
   {
     title: 'Legal Pages',
     description: 'Edit Terms of Service and Privacy Policy pages.',
     icon: <DescriptionIcon sx={{ fontSize: 40 }} />,
-    color: '#144B6E',
+    color: '#002664',
     href: '/terms',
   },
 ];
@@ -47,7 +47,7 @@ export default function AdminContentPage() {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#144B6E' }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#002664' }}>
           Content Management
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>

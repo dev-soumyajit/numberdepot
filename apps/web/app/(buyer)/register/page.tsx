@@ -15,8 +15,6 @@ import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import ToggleButton from '@mui/material/ToggleButton';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
@@ -26,7 +24,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { useAuth } from '@/lib/auth';
 import { useSnackbar } from '@/lib/snackbar';
-import { api } from '@/lib/api';
+import { api, ApiError } from '@/lib/api';
 
 interface FormErrors {
   firstName?: string;
@@ -41,6 +39,7 @@ export default function RegisterPage() {
   const { user, login } = useAuth();
   const { showSnackbar } = useSnackbar();
 
+  const [step, setStep] = useState<'register' | 'otp'>('register');
   const [role, setRole] = useState<'buyer' | 'seller'>('buyer');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -50,6 +49,11 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+
+  // OTP state
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   if (user) {
     router.replace('/account');
@@ -79,17 +83,150 @@ export default function RegisterPage() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await api.post('/auth/register', { email, password, firstName, lastName, role });
-      await login(email, password);
-      showSnackbar('Account created successfully! Welcome to NumberDepot.', 'success');
-      router.push(role === 'seller' ? '/seller' : '/account');
+      const res = await api.post<{ message?: string; email?: string; token?: string }>('/auth/register', { email, password, firstName, lastName, role });
+      if (res.data?.token) {
+        // Mock fallback — immediate login (no OTP needed)
+        await login(email, password);
+        showSnackbar('Account created successfully! Welcome to NumberDepot.', 'success');
+        router.push(role === 'seller' ? '/seller' : '/account');
+      } else {
+        // Real API — needs OTP verification
+        showSnackbar('Verification code sent to your email!', 'success');
+        setStep('otp');
+        startResendCooldown();
+      }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+      const msg = err instanceof ApiError ? (err.data as { error?: string })?.error || err.message : 'Registration failed. Please try again.';
       showSnackbar(msg, 'error');
     } finally {
       setLoading(false);
     }
   };
+
+  const startResendCooldown = () => {
+    setResendCooldown(60);
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) { clearInterval(timer); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otp.length !== 6) {
+      setOtpError('Please enter the 6-digit code');
+      return;
+    }
+    setLoading(true);
+    setOtpError('');
+    try {
+      const res = await api.post<{ token: string; user: { id: string; firstName: string; lastName: string; email: string; role: string } }>('/auth/verify-otp', { email, otp });
+      if (res.data?.token) {
+        localStorage.setItem('token', res.data.token);
+        // Refresh auth state
+        await login(email, password);
+        showSnackbar('Email verified! Welcome to NumberDepot.', 'success');
+        router.push(role === 'seller' ? '/seller' : '/account');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof ApiError ? (err.data as { error?: string })?.error || err.message : 'Verification failed';
+      setOtpError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    try {
+      await api.post('/auth/resend-otp', { email });
+      showSnackbar('New verification code sent!', 'success');
+      startResendCooldown();
+    } catch {
+      showSnackbar('Failed to resend code. Please try again.', 'error');
+    }
+  };
+
+  // OTP Step
+  if (step === 'otp') {
+    return (
+      <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', py: 6, bgcolor: 'background.paper' }}>
+        <Container maxWidth="sm">
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography variant="h3" sx={{ mb: 1 }}>Verify Your Email</Typography>
+            <Typography variant="body1" color="text.secondary">
+              We sent a 6-digit code to <strong>{email}</strong>
+            </Typography>
+          </Box>
+
+          <Card sx={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+            <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
+              <Box component="form" onSubmit={handleVerifyOtp} noValidate>
+                <TextField
+                  fullWidth
+                  label="Verification Code"
+                  value={otp}
+                  onChange={(e) => { setOtp(e.target.value.replace(/\D/g, '').slice(0, 6)); setOtpError(''); }}
+                  error={!!otpError}
+                  helperText={otpError || 'Enter the 6-digit code from your email'}
+                  sx={{ mb: 3 }}
+                  slotProps={{
+                    input: {
+                      sx: { fontSize: '1.5rem', letterSpacing: '0.3em', textAlign: 'center', fontWeight: 700 },
+                      startAdornment: <InputAdornment position="start"><EmailIcon sx={{ color: 'text.disabled', fontSize: 20 }} /></InputAdornment>,
+                    },
+                  }}
+                />
+                <Button
+                  type="submit" variant="contained" color="primary"
+                  fullWidth size="large" disabled={loading || otp.length !== 6}
+                  sx={{ py: 1.5, fontSize: '1rem', mb: 2 }}
+                >
+                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Verify & Create Account'}
+                </Button>
+              </Box>
+
+              <Box sx={{ textAlign: 'center', mt: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Didn&apos;t receive the code?{' '}
+                  <Typography
+                    component="button"
+                    variant="body2"
+                    onClick={handleResendOtp}
+                    disabled={resendCooldown > 0}
+                    sx={{
+                      color: resendCooldown > 0 ? 'text.disabled' : 'primary.main',
+                      fontWeight: 700,
+                      cursor: resendCooldown > 0 ? 'default' : 'pointer',
+                      background: 'none',
+                      border: 'none',
+                      textDecoration: resendCooldown > 0 ? 'none' : 'underline',
+                      p: 0,
+                    }}
+                  >
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
+                  </Typography>
+                </Typography>
+              </Box>
+
+              <Box sx={{ textAlign: 'center', mt: 2 }}>
+                <Typography
+                  component="button"
+                  variant="body2"
+                  onClick={() => setStep('register')}
+                  sx={{ color: 'text.secondary', cursor: 'pointer', background: 'none', border: 'none', textDecoration: 'underline', p: 0 }}
+                >
+                  Back to registration
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Container>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', py: 6, bgcolor: 'background.paper' }}>
@@ -107,34 +244,41 @@ export default function RegisterPage() {
             <Typography variant="subtitle2" sx={{ mb: 1.5, textAlign: 'center', color: 'text.secondary' }}>
               I want to...
             </Typography>
-            <ToggleButtonGroup
-              value={role}
-              exclusive
-              onChange={(_, val) => val && setRole(val)}
-              fullWidth
-              sx={{ mb: 3 }}
-            >
-              <ToggleButton value="buyer" sx={{
-                py: 1.5,
-                textTransform: 'none',
-                fontWeight: 600,
-                gap: 1,
-                '&.Mui-selected': { bgcolor: 'primary.main', color: '#fff', '&:hover': { bgcolor: 'primary.dark' } },
-              }}>
-                <ShoppingCartIcon fontSize="small" />
+            <Box sx={{ display: 'flex', gap: 1.5, mb: 3 }}>
+              <Button
+                fullWidth
+                variant={role === 'buyer' ? 'contained' : 'outlined'}
+                color="primary"
+                onClick={() => setRole('buyer')}
+                startIcon={<ShoppingCartIcon />}
+                sx={{
+                  py: 1.5,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  ...(role === 'buyer' ? {} : { borderColor: 'divider', color: 'text.secondary' }),
+                }}
+              >
                 Buy Numbers
-              </ToggleButton>
-              <ToggleButton value="seller" sx={{
-                py: 1.5,
-                textTransform: 'none',
-                fontWeight: 600,
-                gap: 1,
-                '&.Mui-selected': { bgcolor: '#F7941E', color: '#fff', '&:hover': { bgcolor: '#E8850A' } },
-              }}>
-                <StorefrontIcon fontSize="small" />
+              </Button>
+              <Button
+                fullWidth
+                variant={role === 'seller' ? 'contained' : 'outlined'}
+                onClick={() => setRole('seller')}
+                startIcon={<StorefrontIcon />}
+                sx={{
+                  py: 1.5,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  ...(role === 'seller'
+                    ? { bgcolor: '#E53935', color: '#fff', '&:hover': { bgcolor: '#C62828' } }
+                    : { borderColor: 'divider', color: 'text.secondary' }),
+                }}
+              >
                 Sell Numbers
-              </ToggleButton>
-            </ToggleButtonGroup>
+              </Button>
+            </Box>
 
             {role === 'seller' && (
               <Box sx={{ bgcolor: '#FFF8E1', border: '1px solid #FFE082', borderRadius: 2, p: 2, mb: 3 }}>
@@ -178,7 +322,7 @@ export default function RegisterPage() {
                 sx={{ mb: 2.5 }}
                 slotProps={{ input: {
                   startAdornment: <InputAdornment position="start"><LockIcon sx={{ color: 'text.disabled', fontSize: 20 }} /></InputAdornment>,
-                  endAdornment: <InputAdornment position="end"><IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">{showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}</IconButton></InputAdornment>,
+                  endAdornment: <InputAdornment position="end"><IconButton type="button" onClick={() => setShowPassword((prev) => !prev)} onMouseDown={(e) => e.preventDefault()} edge="end" size="small">{showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}</IconButton></InputAdornment>,
                 } }}
               />
               <TextField

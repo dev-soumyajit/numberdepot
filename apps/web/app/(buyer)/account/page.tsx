@@ -233,8 +233,8 @@ export default function AccountProfilePage() {
                 sx={{
                   mt: 0.5,
                   fontWeight: 700,
-                  bgcolor: '#144B6E18',
-                  color: '#144B6E',
+                  bgcolor: '#00266418',
+                  color: '#002664',
                 }}
               />
             </Grid>
@@ -248,8 +248,8 @@ export default function AccountProfilePage() {
                 sx={{
                   mt: 0.5,
                   fontWeight: 700,
-                  bgcolor: profile?.status === 'active' ? '#84BD0018' : '#F7941E18',
-                  color: profile?.status === 'active' ? '#84BD00' : '#F7941E',
+                  bgcolor: profile?.status === 'active' ? '#84BD0018' : '#E5393518',
+                  color: profile?.status === 'active' ? '#84BD00' : '#E53935',
                 }}
               />
             </Grid>

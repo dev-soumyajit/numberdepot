@@ -60,9 +60,9 @@ function formatPhone(num: string): string {
 function getTypeColor(type: string): string {
   switch (type?.toLowerCase()) {
     case 'toll-free': return '#4BA0A1';
-    case 'vanity': return '#F7941E';
+    case 'vanity': return '#E53935';
     case 'local': return '#84BD00';
-    default: return '#144B6E';
+    default: return '#002664';
   }
 }
 
@@ -181,7 +181,7 @@ function SearchPageContent() {
       {/* Search Header */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)',
+          background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)',
           py: { xs: 4, md: 5 },
           pb: { xs: 5, md: 6 },
         }}
@@ -454,8 +454,8 @@ function SearchPageContent() {
                             label="Premium"
                             size="small"
                             sx={{
-                              bgcolor: '#F7941E18',
-                              color: '#F7941E',
+                              bgcolor: '#E5393518',
+                              color: '#E53935',
                               fontWeight: 700,
                               fontSize: '0.7rem',
                             }}

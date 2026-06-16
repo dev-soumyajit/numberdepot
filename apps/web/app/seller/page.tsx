@@ -49,9 +49,9 @@ interface DashboardData {
 }
 
 const statCards = [
-  { key: 'totalSales', label: 'Total Sales', icon: ShoppingCartIcon, color: '#144B6E', format: 'number' },
+  { key: 'totalSales', label: 'Total Sales', icon: ShoppingCartIcon, color: '#002664', format: 'number' },
   { key: 'totalRevenue', label: 'Total Revenue', icon: TrendingUpIcon, color: '#84BD00', format: 'currency' },
-  { key: 'pendingBalance', label: 'Pending Balance', icon: HourglassEmptyIcon, color: '#F7941E', format: 'currency' },
+  { key: 'pendingBalance', label: 'Pending Balance', icon: HourglassEmptyIcon, color: '#E53935', format: 'currency' },
   { key: 'availableBalance', label: 'Available Balance', icon: AccountBalanceWalletIcon, color: '#4BA0A1', format: 'currency' },
 ] as const;
 
@@ -94,7 +94,7 @@ export default function SellerDashboard() {
     <Box>
       <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700 }}>
+          <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700 }}>
             Welcome back{user ? `, ${user.firstName}` : ''}
           </Typography>
           <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
@@ -150,7 +150,7 @@ export default function SellerDashboard() {
                   {loading ? (
                     <Skeleton width={100} height={36} />
                   ) : (
-                    <Typography variant="h4" sx={{ fontWeight: 700, color: '#144B6E' }}>
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: '#002664' }}>
                       {card.format === 'currency' ? formatCurrency(value) : value.toLocaleString()}
                     </Typography>
                   )}
@@ -163,10 +163,10 @@ export default function SellerDashboard() {
 
       {/* Affiliate Code */}
       {(loading || data?.affiliateCode) && (
-        <Card sx={{ mb: 4, border: '1px dashed', borderColor: '#F7941E' }}>
+        <Card sx={{ mb: 4, border: '1px dashed', borderColor: '#E53935' }}>
           <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 2, '&:last-child': { pb: 2 } }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <AttachMoneyIcon sx={{ color: '#F7941E', fontSize: 28 }} />
+              <AttachMoneyIcon sx={{ color: '#E53935', fontSize: 28 }} />
               <Box>
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                   Your Affiliate Code
@@ -174,14 +174,14 @@ export default function SellerDashboard() {
                 {loading ? (
                   <Skeleton width={120} height={28} />
                 ) : (
-                  <Typography variant="h6" sx={{ fontWeight: 700, fontFamily: 'monospace', color: '#144B6E' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, fontFamily: 'monospace', color: '#002664' }}>
                     {data?.affiliateCode}
                   </Typography>
                 )}
               </Box>
             </Box>
             <Tooltip title="Copy affiliate code">
-              <IconButton onClick={copyAffiliateCode} sx={{ color: '#F7941E' }}>
+              <IconButton onClick={copyAffiliateCode} sx={{ color: '#E53935' }}>
                 <ContentCopyIcon />
               </IconButton>
             </Tooltip>
@@ -193,7 +193,7 @@ export default function SellerDashboard() {
       <Card>
         <CardContent sx={{ p: 0 }}>
           <Box sx={{ p: 3, pb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography variant="h5" sx={{ color: '#144B6E', fontWeight: 600 }}>
+            <Typography variant="h5" sx={{ color: '#002664', fontWeight: 600 }}>
               Recent Sales
             </Typography>
             <Button component={Link} href="/seller/sales" size="small" sx={{ color: '#4BA0A1' }}>
@@ -234,8 +234,8 @@ export default function SellerDashboard() {
                           label={sale.status}
                           size="small"
                           sx={{
-                            bgcolor: sale.status === 'completed' ? '#84BD0020' : sale.status === 'pending' ? '#F7941E20' : '#E74C3C20',
-                            color: sale.status === 'completed' ? '#6B9A00' : sale.status === 'pending' ? '#E8850A' : '#E74C3C',
+                            bgcolor: sale.status === 'completed' ? '#84BD0020' : sale.status === 'pending' ? '#E5393520' : '#E74C3C20',
+                            color: sale.status === 'completed' ? '#6B9A00' : sale.status === 'pending' ? '#C62828' : '#E74C3C',
                             fontWeight: 600,
                             textTransform: 'capitalize',
                           }}

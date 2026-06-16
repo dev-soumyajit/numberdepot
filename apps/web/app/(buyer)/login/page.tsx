@@ -172,7 +172,7 @@ export default function LoginPage() {
                 sx={{ mb: 1 }}
                 slotProps={{ input: {
                   startAdornment: <InputAdornment position="start"><LockIcon sx={{ color: 'text.disabled', fontSize: 20 }} /></InputAdornment>,
-                  endAdornment: <InputAdornment position="end"><IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">{showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}</IconButton></InputAdornment>,
+                  endAdornment: <InputAdornment position="end"><IconButton type="button" onClick={() => setShowPassword((prev) => !prev)} onMouseDown={(e) => e.preventDefault()} edge="end" size="small">{showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}</IconButton></InputAdornment>,
                 } }}
               />
               <Box sx={{ textAlign: 'right', mb: 2.5 }}>

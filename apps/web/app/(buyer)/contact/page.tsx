@@ -37,7 +37,7 @@ export default function ContactPage() {
   return (
     <Box>
       {/* Hero */}
-      <Box sx={{ background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)', color: '#fff', py: { xs: 5, md: 8 } }}>
+      <Box sx={{ background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)', color: '#fff', py: { xs: 5, md: 8 } }}>
         <Container maxWidth="lg">
           <Typography variant="h3" sx={{ fontWeight: 900, mb: 2 }}>Contact Us</Typography>
           <Typography variant="h6" sx={{ opacity: 0.85, fontWeight: 400 }}>

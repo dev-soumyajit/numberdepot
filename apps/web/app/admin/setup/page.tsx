@@ -87,7 +87,7 @@ export default function AdminSetupPage() {
 
   if (adminExists) {
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#0D3A56' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#001a45' }}>
         <Container maxWidth="sm">
           <Card sx={{ textAlign: 'center', p: 4 }}>
             <AdminPanelSettingsIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
@@ -103,10 +103,10 @@ export default function AdminSetupPage() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', py: 6, bgcolor: '#0D3A56' }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', py: 6, bgcolor: '#001a45' }}>
       <Container maxWidth="sm">
         <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <AdminPanelSettingsIcon sx={{ fontSize: 56, color: '#F7941E', mb: 1 }} />
+          <AdminPanelSettingsIcon sx={{ fontSize: 56, color: '#E53935', mb: 1 }} />
           <Typography variant="h3" sx={{ color: '#fff', mb: 1 }}>Admin Setup</Typography>
           <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.6)' }}>
             Create the first admin account for NumberDepot

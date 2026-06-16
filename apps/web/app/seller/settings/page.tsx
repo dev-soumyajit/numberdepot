@@ -166,7 +166,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <Box>
-        <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700, mb: 4 }}>Settings</Typography>
+        <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700, mb: 4 }}>Settings</Typography>
         {Array.from({ length: 2 }).map((_, i) => (
           <Card key={i} sx={{ mb: 3 }}>
             <CardContent sx={{ p: 3 }}>
@@ -184,7 +184,7 @@ export default function SettingsPage() {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700 }}>
+        <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700 }}>
           Settings
         </Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
@@ -196,8 +196,8 @@ export default function SettingsPage() {
       <Card sx={{ mb: 3 }}>
         <CardContent sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-            <BusinessIcon sx={{ color: '#144B6E', fontSize: 24 }} />
-            <Typography variant="h5" sx={{ color: '#144B6E', fontWeight: 600 }}>
+            <BusinessIcon sx={{ color: '#002664', fontSize: 24 }} />
+            <Typography variant="h5" sx={{ color: '#002664', fontWeight: 600 }}>
               Business Information
             </Typography>
           </Box>
@@ -256,7 +256,7 @@ export default function SettingsPage() {
         <CardContent sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
             <AccountBalanceIcon sx={{ color: '#4BA0A1', fontSize: 24 }} />
-            <Typography variant="h5" sx={{ color: '#144B6E', fontWeight: 600 }}>
+            <Typography variant="h5" sx={{ color: '#002664', fontWeight: 600 }}>
               Payout Details
             </Typography>
           </Box>
@@ -334,7 +334,7 @@ export default function SettingsPage() {
                   />
                 </Grid>
               </Grid>
-              <Alert severity="info" sx={{ mt: 2, bgcolor: '#144B6E08' }}>
+              <Alert severity="info" sx={{ mt: 2, bgcolor: '#00266408' }}>
                 Your banking information is encrypted and stored securely. We will never share it with third parties.
               </Alert>
             </>
@@ -367,7 +367,7 @@ export default function SettingsPage() {
           {profile.preferredPayoutMethod === 'check' && (
             <>
               <Divider sx={{ my: 3 }} />
-              <Alert severity="warning" sx={{ bgcolor: '#F7941E08' }}>
+              <Alert severity="warning" sx={{ bgcolor: '#E5393508' }}>
                 Checks are mailed to your registered business address. Please ensure your address is up to date in your account profile. Checks may take 7-10 business days to arrive.
               </Alert>
             </>

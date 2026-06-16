@@ -21,7 +21,6 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import PhoneIcon from '@mui/icons-material/Phone';
 import SearchIcon from '@mui/icons-material/Search';
 import { useAuth } from '@/lib/auth';
 import { useCart } from '@/lib/cart';
@@ -49,17 +48,19 @@ export default function Header() {
       <AppBar position="sticky" sx={{ bgcolor: '#fff', color: 'text.primary' }}>
         <Toolbar sx={{ maxWidth: 1200, width: '100%', mx: 'auto', px: { xs: 2, md: 3 } }}>
           {/* Logo */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
-            <PhoneIcon sx={{ fontSize: 28, color: 'primary.main' }} />
-            <Typography variant="h6" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: '-0.5px', display: { xs: 'none', sm: 'block' } }}>
-              NumberDepot
-            </Typography>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <Box
+              component="img"
+              src="/images/logo.png"
+              alt="NumberDepot"
+              sx={{ height: { xs: 36, sm: 44 }, width: 'auto' }}
+            />
           </Link>
 
           {/* Desktop Nav */}
           <Box sx={{ flex: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', gap: 1 }}>
             {navLinks.map((link) => (
-              <Button key={link.href} component={Link} href={link.href} sx={{ color: 'text.secondary', fontWeight: 600, '&:hover': { color: 'primary.main', bgcolor: 'rgba(20,75,110,0.04)' } }}>
+              <Button key={link.href} component={Link} href={link.href} sx={{ color: 'text.secondary', fontWeight: 600, '&:hover': { color: 'primary.main', bgcolor: 'rgba(0,38,100,0.04)' } }}>
                 {link.label}
               </Button>
             ))}

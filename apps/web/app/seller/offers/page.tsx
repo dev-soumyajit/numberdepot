@@ -46,7 +46,7 @@ interface Offer {
 type StatusFilter = 'all' | 'pending' | 'accepted' | 'declined' | 'countered';
 
 const statusColors: Record<string, { bg: string; text: string }> = {
-  pending: { bg: '#F7941E20', text: '#E8850A' },
+  pending: { bg: '#E5393520', text: '#C62828' },
   accepted: { bg: '#84BD0020', text: '#6B9A00' },
   declined: { bg: '#E74C3C20', text: '#E74C3C' },
   countered: { bg: '#4BA0A120', text: '#4BA0A1' },
@@ -174,7 +174,7 @@ export default function OffersPage() {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" sx={{ color: '#144B6E', fontWeight: 700 }}>
+        <Typography variant="h3" sx={{ color: '#002664', fontWeight: 700 }}>
           Offers
         </Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
@@ -183,7 +183,7 @@ export default function OffersPage() {
             <Chip
               label={`${pendingCount} pending`}
               size="small"
-              sx={{ ml: 1, bgcolor: '#F7941E20', color: '#E8850A', fontWeight: 600 }}
+              sx={{ ml: 1, bgcolor: '#E5393520', color: '#C62828', fontWeight: 600 }}
             />
           )}
         </Typography>
@@ -252,7 +252,7 @@ export default function OffersPage() {
                       </TableCell>
                       <TableCell sx={{ color: 'text.secondary' }}>{formatCurrency(offer.listingPrice)}</TableCell>
                       <TableCell>
-                        <Typography sx={{ fontWeight: 700, color: '#144B6E' }}>
+                        <Typography sx={{ fontWeight: 700, color: '#002664' }}>
                           {formatCurrency(offer.amount)}
                         </Typography>
                         {offer.counterAmount && (

@@ -30,10 +30,10 @@ interface DashboardMetrics {
 }
 
 const statCardConfig = [
-  { key: 'totalUsers', label: 'Total Users', icon: <PeopleIcon />, color: '#144B6E', format: 'number' },
+  { key: 'totalUsers', label: 'Total Users', icon: <PeopleIcon />, color: '#002664', format: 'number' },
   { key: 'totalNumbers', label: 'Total Numbers', icon: <PhoneIcon />, color: '#4BA0A1', format: 'number' },
   { key: 'totalOrders', label: 'Total Orders', icon: <ShoppingCartIcon />, color: '#84BD00', format: 'number' },
-  { key: 'totalRevenue', label: 'Total Revenue', icon: <AttachMoneyIcon />, color: '#F7941E', format: 'currency' },
+  { key: 'totalRevenue', label: 'Total Revenue', icon: <AttachMoneyIcon />, color: '#E53935', format: 'currency' },
   { key: 'newUsersThisMonth', label: 'New Users This Month', icon: <PersonAddIcon />, color: '#7B68EE', format: 'number' },
   { key: 'pendingBrokers', label: 'Pending Brokers', icon: <PendingActionsIcon />, color: '#E74C3C', format: 'number' },
 ] as const;
@@ -137,9 +137,9 @@ export default function AdminDashboardPage() {
       </Typography>
       <Grid container spacing={2}>
         {[
-          { label: 'Manage Numbers', href: '/admin/numbers', color: '#144B6E' },
+          { label: 'Manage Numbers', href: '/admin/numbers', color: '#002664' },
           { label: 'View Users', href: '/admin/users', color: '#4BA0A1' },
-          { label: 'Broker Applications', href: '/admin/brokers', color: '#F7941E' },
+          { label: 'Broker Applications', href: '/admin/brokers', color: '#E53935' },
           { label: 'View Orders', href: '/admin/orders', color: '#84BD00' },
           { label: 'Commissions', href: '/admin/commissions', color: '#7B68EE' },
           { label: 'Platform Settings', href: '/admin/settings', color: '#E74C3C' },

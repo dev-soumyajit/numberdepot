@@ -1,7 +1,7 @@
 /* ========== HERO SECTION ========== */
 .hero {
   position: relative;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #0d3550) 60%, #091f30 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #001a45) 60%, #000d2a 100%);
   color: #fff;
   padding: 5rem 0 4rem;
   overflow: hidden;
@@ -43,7 +43,7 @@
 }
 
 .heroTitleAccent {
-  color: var(--accent, #F7941E);
+  color: var(--accent, #E53935);
 }
 
 .heroSubtitle {
@@ -80,7 +80,7 @@
 }
 
 .heroSearchBtn {
-  background: var(--accent, #F7941E);
+  background: var(--accent, #E53935);
   color: #fff;
   border: none;
   padding: 1rem 2rem;
@@ -93,7 +93,7 @@
 }
 
 .heroSearchBtn:hover {
-  background: #e5850b;
+  background: #B71C1C;
 }
 
 .heroStats {
@@ -111,7 +111,7 @@
   font-size: 1.5rem;
   font-weight: 800;
   display: block;
-  color: var(--accent, #F7941E);
+  color: var(--accent, #E53935);
 }
 
 .heroStatLabel {
@@ -186,14 +186,14 @@
 
 .areaCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 28px rgba(20,75,110,0.10);
-  border-color: var(--accent, #F7941E);
+  box-shadow: 0 8px 28px rgba(0,38,100,0.10);
+  border-color: var(--accent, #E53935);
 }
 
 .areaCode {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary, #144B6E);
+  color: var(--primary, #002664);
   display: block;
   margin-bottom: 0.35rem;
 }
@@ -208,7 +208,7 @@
 .areaBrowse {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--accent, #F7941E);
+  color: var(--accent, #E53935);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -232,7 +232,7 @@
 
 .numberCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 28px rgba(20,75,110,0.10);
+  box-shadow: 0 8px 28px rgba(0,38,100,0.10);
 }
 
 .numberBadge {
@@ -282,7 +282,7 @@
 .numberPrice {
   font-size: 1.35rem;
   font-weight: 800;
-  color: var(--primary, #144B6E);
+  color: var(--primary, #002664);
 }
 
 .numberPricePer {
@@ -297,7 +297,7 @@
 
 .viewAllBtn {
   display: inline-block;
-  background: var(--primary, #144B6E);
+  background: var(--primary, #002664);
   color: #fff;
   padding: 0.85rem 2.5rem;
   border-radius: 10px;
@@ -311,7 +311,7 @@
 }
 
 .viewAllBtn:hover {
-  background: var(--primary-dark, #0d3550);
+  background: var(--primary-dark, #001a45);
   transform: translateY(-2px);
 }
 
@@ -334,14 +334,14 @@
 
 .stepCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 28px rgba(20,75,110,0.08);
+  box-shadow: 0 8px 28px rgba(0,38,100,0.08);
 }
 
 .stepNumber {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--accent, #F7941E);
+  background: var(--accent, #E53935);
   color: #fff;
   font-size: 1.2rem;
   font-weight: 800;
@@ -391,11 +391,11 @@
 
 .planCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 28px rgba(20,75,110,0.10);
+  box-shadow: 0 8px 28px rgba(0,38,100,0.10);
 }
 
 .planPopular {
-  border-color: var(--accent, #F7941E);
+  border-color: var(--accent, #E53935);
 }
 
 .planPopularTag {
@@ -403,7 +403,7 @@
   top: -13px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--accent, #F7941E);
+  background: var(--accent, #E53935);
   color: #fff;
   padding: 0.25rem 1rem;
   border-radius: 20px;
@@ -417,7 +417,7 @@
 .planName {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary, #144B6E);
+  color: var(--primary, #002664);
   margin: 0 0 0.75rem;
 }
 
@@ -463,9 +463,9 @@
   width: 100%;
   padding: 0.75rem;
   border-radius: 10px;
-  border: 2px solid var(--primary, #144B6E);
+  border: 2px solid var(--primary, #002664);
   background: transparent;
-  color: var(--primary, #144B6E);
+  color: var(--primary, #002664);
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
@@ -474,19 +474,19 @@
 }
 
 .planBtn:hover {
-  background: var(--primary, #144B6E);
+  background: var(--primary, #002664);
   color: #fff;
 }
 
 .planBtnPrimary {
-  background: var(--accent, #F7941E);
-  border-color: var(--accent, #F7941E);
+  background: var(--accent, #E53935);
+  border-color: var(--accent, #E53935);
   color: #fff;
 }
 
 .planBtnPrimary:hover {
-  background: #e5850b;
-  border-color: #e5850b;
+  background: #B71C1C;
+  border-color: #B71C1C;
 }
 
 .pricingCta {
@@ -495,7 +495,7 @@
 
 /* ========== TRUST / CTA ========== */
 .ctaSection {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #0d3550) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #001a45) 100%);
   color: #fff;
   padding: 5rem 0;
   text-align: center;
@@ -524,7 +524,7 @@
 }
 
 .ctaBtnPrimary {
-  background: var(--accent, #F7941E);
+  background: var(--accent, #E53935);
   color: #fff;
   padding: 1rem 2.5rem;
   border-radius: 10px;
@@ -538,7 +538,7 @@
 }
 
 .ctaBtnPrimary:hover {
-  background: #e5850b;
+  background: #B71C1C;
   transform: translateY(-2px);
 }
 

@@ -7,7 +7,7 @@ import CardContent from '@mui/material/CardContent';
 export default function TermsPage() {
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '80vh' }}>
-      <Box sx={{ background: 'linear-gradient(135deg, #144B6E 0%, #0D3A56 100%)', py: 5, color: '#fff' }}>
+      <Box sx={{ background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)', py: 5, color: '#fff' }}>
         <Container maxWidth="md">
           <Typography variant="h3" sx={{ fontWeight: 800, textAlign: 'center' }}>
             Terms of Service

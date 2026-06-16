@@ -140,7 +140,7 @@ export default function AdminSettingsPage() {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 12 }}>
-        <CircularProgress sx={{ color: '#144B6E' }} />
+        <CircularProgress sx={{ color: '#002664' }} />
       </Box>
     );
   }
@@ -173,9 +173,9 @@ export default function AdminSettingsPage() {
             onClick={() => setAddDialog(true)}
             sx={{
               textTransform: 'none',
-              borderColor: '#F7941E',
-              color: '#F7941E',
-              '&:hover': { borderColor: '#E8850A', bgcolor: '#F7941E08' },
+              borderColor: '#E53935',
+              color: '#E53935',
+              '&:hover': { borderColor: '#C62828', bgcolor: '#E5393508' },
               borderRadius: 2,
             }}
           >
@@ -199,8 +199,8 @@ export default function AdminSettingsPage() {
                 onClick={handleSave}
                 disabled={saving}
                 sx={{
-                  bgcolor: '#144B6E',
-                  '&:hover': { bgcolor: '#0D3A56' },
+                  bgcolor: '#002664',
+                  '&:hover': { bgcolor: '#001a45' },
                   textTransform: 'none',
                 }}
               >
@@ -274,11 +274,11 @@ export default function AdminSettingsPage() {
                         <Typography
                           variant="body2"
                           sx={{
-                            color: settings[key] !== originalSettings[key] ? '#F7941E' : 'text.secondary',
+                            color: settings[key] !== originalSettings[key] ? '#E53935' : 'text.secondary',
                             fontWeight: settings[key] !== originalSettings[key] ? 600 : 400,
                             fontFamily: 'monospace',
                             cursor: 'pointer',
-                            '&:hover': { color: '#144B6E' },
+                            '&:hover': { color: '#002664' },
                           }}
                           onClick={() => setEditingKey(key)}
                         >
@@ -312,8 +312,8 @@ export default function AdminSettingsPage() {
             onClick={handleSave}
             disabled={saving}
             sx={{
-              bgcolor: '#144B6E',
-              '&:hover': { bgcolor: '#0D3A56' },
+              bgcolor: '#002664',
+              '&:hover': { bgcolor: '#001a45' },
               textTransform: 'none',
               fontWeight: 600,
               borderRadius: 2,
@@ -358,8 +358,8 @@ export default function AdminSettingsPage() {
             onClick={handleAddSetting}
             disabled={saving || !newKey.trim()}
             sx={{
-              bgcolor: '#144B6E',
-              '&:hover': { bgcolor: '#0D3A56' },
+              bgcolor: '#002664',
+              '&:hover': { bgcolor: '#001a45' },
               textTransform: 'none',
               fontWeight: 600,
             }}

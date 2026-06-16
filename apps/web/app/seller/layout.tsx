@@ -72,7 +72,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
   if (loading || brokerLoading) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <CircularProgress sx={{ color: '#144B6E' }} />
+        <CircularProgress sx={{ color: '#002664' }} />
       </Box>
     );
   }
@@ -86,13 +86,13 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
       return (
         <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', p: 4 }}>
           <Box>
-            <Box component="img" src="/images/mascot.png" alt="" className="mascot-img" sx={{ height: 80, mb: 2, mx: 'auto' }} />
+            <Box component="img" src="/images/elephant-01.png" alt="" className="mascot-img" sx={{ height: 80, mb: 2, mx: 'auto' }} />
             <h2 style={{ marginBottom: 8 }}>Application Under Review</h2>
             <p style={{ color: '#535E66', marginBottom: 24, maxWidth: 400 }}>
               Your broker application is being reviewed by our team.
               You will receive an email once it is approved.
             </p>
-            <Link href="/" style={{ color: '#144B6E', fontWeight: 600 }}>Go to Homepage</Link>
+            <Link href="/" style={{ color: '#002664', fontWeight: 600 }}>Go to Homepage</Link>
           </Box>
         </Box>
       );
@@ -110,7 +110,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
                 ? 'Unfortunately your broker application was not approved. Please contact support for more details.'
                 : 'Your seller account has been suspended. Please contact support.'}
             </p>
-            <Link href="/" style={{ color: '#144B6E', fontWeight: 600 }}>Go to Homepage</Link>
+            <Link href="/" style={{ color: '#002664', fontWeight: 600 }}>Go to Homepage</Link>
           </Box>
         </Box>
       );
@@ -137,7 +137,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.logo}>
-          <img src="/images/mascot.png" alt="NumberDepot" className={styles.logoImg} />
+          <img src="/images/logo.png" alt="NumberDepot" className={styles.logoImg} />
           <div>
             <div className={styles.logoText}>NumberDepot</div>
             <span className={styles.logoSub}>Seller Portal</span>
