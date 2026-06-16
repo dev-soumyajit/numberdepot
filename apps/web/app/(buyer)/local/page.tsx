@@ -67,8 +67,8 @@ export default function LocalNumbersPage() {
       {/* Hero */}
       <Box sx={{ background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)', color: '#fff', py: { xs: 6, md: 10 } }}>
         <Container maxWidth="lg">
-          <Typography variant="h3" sx={{ fontWeight: 900, mb: 2 }}>Local Phone Numbers</Typography>
-          <Typography variant="h6" sx={{ opacity: 0.85, maxWidth: 600, mb: 4, fontWeight: 400 }}>
+          <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: '#fff' }}>Local Phone Numbers</Typography>
+          <Typography variant="h6" sx={{ color: '#fff', maxWidth: 600, mb: 4, fontWeight: 400 }}>
             Establish a local presence anywhere in the US. Choose from hundreds of area codes to connect with customers in any city.
           </Typography>
           <Button component={Link} href="/search?number_type=local" variant="contained" color="secondary" size="large" endIcon={<ArrowForwardIcon />}>

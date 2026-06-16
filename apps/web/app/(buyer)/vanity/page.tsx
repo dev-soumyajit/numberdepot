@@ -41,8 +41,8 @@ export default function VanityPage() {
       {/* Hero */}
       <Box sx={{ background: 'linear-gradient(135deg, #8B5E00 0%, #6B4700 100%)', color: '#fff', py: { xs: 6, md: 10 } }}>
         <Container maxWidth="lg">
-          <Typography variant="h3" sx={{ fontWeight: 900, mb: 2 }}>Vanity Numbers</Typography>
-          <Typography variant="h6" sx={{ opacity: 0.85, maxWidth: 600, mb: 4, fontWeight: 400 }}>
+          <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: '#fff' }}>Vanity Numbers</Typography>
+          <Typography variant="h6" sx={{ color: '#fff', maxWidth: 600, mb: 4, fontWeight: 400 }}>
             Make your phone number spell your brand. Vanity numbers are proven to increase recall by up to 84% and boost call volume.
           </Typography>
           <Button component={Link} href="/search?number_type=vanity" variant="contained" color="secondary" size="large" endIcon={<ArrowForwardIcon />}>

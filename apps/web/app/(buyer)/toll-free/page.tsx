@@ -60,8 +60,8 @@ export default function TollFreePage() {
       {/* Hero */}
       <Box sx={{ background: 'linear-gradient(135deg, #1a6b3c 0%, #0e4526 100%)', color: '#fff', py: { xs: 6, md: 10 } }}>
         <Container maxWidth="lg">
-          <Typography variant="h3" sx={{ fontWeight: 900, mb: 2 }}>Toll-Free Numbers</Typography>
-          <Typography variant="h6" sx={{ opacity: 0.85, maxWidth: 600, mb: 4, fontWeight: 400 }}>
+          <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: '#fff' }}>Toll-Free Numbers</Typography>
+          <Typography variant="h6" sx={{ color: '#fff', maxWidth: 600, mb: 4, fontWeight: 400 }}>
             Let your customers call for free. Toll-free numbers build trust and make your business accessible from anywhere in the country.
           </Typography>
           <Button component={Link} href="/search?number_type=toll_free" variant="contained" color="secondary" size="large" endIcon={<ArrowForwardIcon />}>
