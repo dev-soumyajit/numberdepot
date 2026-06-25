@@ -121,10 +121,10 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                         mx: 1,
                         borderRadius: 1.5,
                         mb: 0.5,
-                        bgcolor: isActive ? 'primary.main' + '10' : 'transparent',
-                        color: isActive ? 'primary.main' : 'text.secondary',
+                        bgcolor: isActive ? '#E5393510' : 'transparent',
+                        color: isActive ? '#E53935' : 'text.secondary',
                         '&:hover': {
-                          bgcolor: isActive ? 'primary.main' + '15' : 'action.hover',
+                          bgcolor: isActive ? '#E5393515' : 'action.hover',
                         },
                       }}
                     >

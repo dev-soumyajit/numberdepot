@@ -81,7 +81,7 @@
 }
 
 .navItemActive {
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(229, 57, 53, 0.18) !important;
   color: #fff !important;
   font-weight: 600;
   box-shadow: inset 3px 0 0 var(--accent);
