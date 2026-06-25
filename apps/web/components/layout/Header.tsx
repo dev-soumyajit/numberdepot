@@ -67,7 +67,7 @@ export default function Header() {
           </Box>
 
           {/* Right Side */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
             <IconButton component={Link} href="/search" sx={{ display: { md: 'none' } }}>
               <SearchIcon />
             </IconButton>
