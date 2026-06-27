@@ -14,7 +14,8 @@
       "WebSearch",
       "WebFetch(domain:www.numberbarn.com)",
       "WebFetch(domain:static.demoviewer4.com)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "WebFetch(domain:telcocellular.com)"
     ]
   }
 }
