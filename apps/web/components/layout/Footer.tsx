@@ -80,13 +80,13 @@ export default function Footer() {
           {/* Contact */}
           <Grid size={{ xs: 6, sm: 3, md: 2 }}>
             <Typography variant="subtitle2" sx={{ color: '#fff', mb: 2, fontWeight: 700 }}>Contact</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <EmailIcon sx={{ fontSize: 16, opacity: 0.7 }} />
-              <Typography variant="body2">support@numberdepot.com</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, minWidth: 0 }}>
+              <EmailIcon sx={{ fontSize: 16, opacity: 0.7, flexShrink: 0 }} />
+              <Typography variant="body2" sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>support@numberdepot.com</Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <PhoneIcon sx={{ fontSize: 16, opacity: 0.7 }} />
-              <Typography variant="body2">(800) 555-NUMS</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+              <PhoneIcon sx={{ fontSize: 16, opacity: 0.7, flexShrink: 0 }} />
+              <Typography variant="body2" sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>(800) 555-NUMS</Typography>
             </Box>
           </Grid>
         </Grid>

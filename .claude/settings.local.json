@@ -15,7 +15,20 @@
       "WebFetch(domain:www.numberbarn.com)",
       "WebFetch(domain:static.demoviewer4.com)",
       "Bash(curl:*)",
-      "WebFetch(domain:telcocellular.com)"
+      "WebFetch(domain:telcocellular.com)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(PORT=3000 ../../node_modules/.bin/next.exe dev --port 3000)",
+      "Bash(echo \"started, pid $!\")",
+      "Bash(bun add *)",
+      "Bash(npx playwright *)",
+      "Bash(node respcheck.mjs)",
+      "Bash(node diag.mjs)",
+      "PowerShell($conns = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue; if \\($conns\\) { $conns.OwningProcess | Select-Object -Unique | ForEach-Object { try { Stop-Process -Id $_ -Force -ErrorAction Stop; \"stopped PID $_\" } catch {} } } else { \"no listener on 3000\" })",
+      "Bash(echo \"pid $!\")",
+      "Bash(node header.mjs)",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { $c.OwningProcess | Select-Object -Unique | ForEach-Object { try { Stop-Process -Id $_ -Force -ErrorAction Stop; \"stopped PID $_\" } catch {} } } else { \"no listener\" })",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
@@ -37,8 +37,11 @@ export default function Header() {
   const { user, logout, isAdmin, isSeller } = useAuth();
   const { count } = useCart();
   const router = useRouter();
+  const pathname = usePathname();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   const handleMenu = (e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -59,15 +62,28 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <Box sx={{ flex: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', gap: 1 }}>
-            {navLinks.map((link) => (
-              <Button key={link.href} component={Link} href={link.href} sx={{ color: 'text.secondary', fontWeight: 600, '&:hover': { color: 'primary.main', bgcolor: 'rgba(0,38,100,0.04)' } }}>
-                {link.label}
-              </Button>
-            ))}
+            {navLinks.map((link) => {
+              const active = isActive(link.href);
+              return (
+                <Button
+                  key={link.href}
+                  component={Link}
+                  href={link.href}
+                  sx={{
+                    color: active ? '#E53935' : 'text.secondary',
+                    fontWeight: active ? 700 : 600,
+                    bgcolor: active ? 'rgba(229,57,53,0.08)' : 'transparent',
+                    '&:hover': { color: '#E53935', bgcolor: 'rgba(229,57,53,0.06)' },
+                  }}
+                >
+                  {link.label}
+                </Button>
+              );
+            })}
           </Box>
 
           {/* Right Side */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
             <IconButton component={Link} href="/search" sx={{ display: { md: 'none' } }}>
               <SearchIcon />
             </IconButton>
@@ -124,11 +140,23 @@ export default function Header() {
         </Box>
         <Divider />
         <List>
-          {navLinks.map((link) => (
-            <ListItemButton key={link.href} component={Link} href={link.href} onClick={() => setMobileOpen(false)}>
-              <ListItemText primary={link.label} />
-            </ListItemButton>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <ListItemButton
+                key={link.href}
+                component={Link}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                sx={{ bgcolor: active ? 'rgba(229,57,53,0.08)' : 'transparent' }}
+              >
+                <ListItemText
+                  primary={link.label}
+                  slotProps={{ primary: { sx: { color: active ? '#E53935' : 'inherit', fontWeight: active ? 700 : 500 } } }}
+                />
+              </ListItemButton>
+            );
+          })}
           <Divider sx={{ my: 1 }} />
           {!user ? (
             <>
