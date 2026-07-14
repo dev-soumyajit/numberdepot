@@ -22,6 +22,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
+import Checkbox from '@mui/material/Checkbox';
+import Alert from '@mui/material/Alert';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import EditIcon from '@mui/icons-material/Edit';
@@ -62,6 +64,11 @@ export default function AdminNumbersPage() {
   const [editDialog, setEditDialog] = useState<PhoneNumber | null>(null);
   const [editForm, setEditForm] = useState({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', vanityText: '', isPremium: false, description: '' });
   const [saving, setSaving] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkDialog, setBulkDialog] = useState(false);
+  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
+  const [bulkForm, setBulkForm] = useState({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', isPremium: '' });
+  const [bulkSaving, setBulkSaving] = useState(false);
 
   const { showSnackbar } = useSnackbar();
   const router = useRouter();
@@ -88,6 +95,7 @@ export default function AdminNumbersPage() {
 
   useEffect(() => {
     fetchNumbers();
+    clearSelection();
   }, [fetchNumbers]);
 
   const handleDelete = async () => {
@@ -142,6 +150,72 @@ export default function AdminNumbersPage() {
       showSnackbar(message, 'error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Selection helpers
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const toggleSelectAll = () => {
+    if (selected.size === numbers.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(numbers.map((n) => n.id)));
+    }
+  };
+  const clearSelection = () => setSelected(new Set());
+
+  // Bulk edit
+  const handleBulkEdit = async () => {
+    setBulkSaving(true);
+    try {
+      const updates: Record<string, unknown> = {};
+      if (bulkForm.basePrice !== '') updates.basePrice = bulkForm.basePrice;
+      if (bulkForm.monthlyPrice !== '') updates.monthlyPrice = bulkForm.monthlyPrice;
+      if (bulkForm.setupFee !== '') updates.setupFee = bulkForm.setupFee;
+      if (bulkForm.status) updates.status = bulkForm.status;
+      if (bulkForm.numberType) updates.numberType = bulkForm.numberType;
+      if (bulkForm.isPremium !== '') updates.isPremium = bulkForm.isPremium === 'true';
+
+      const res = await api.put<{ matched: number; modified: number }>('/numbers/admin/bulk', {
+        ids: Array.from(selected),
+        updates,
+      });
+      showSnackbar(`${res.data?.modified || 0} numbers updated`, 'success');
+      setBulkDialog(false);
+      setBulkForm({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', isPremium: '' });
+      clearSelection();
+      fetchNumbers();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Bulk update failed';
+      showSnackbar(message, 'error');
+    } finally {
+      setBulkSaving(false);
+    }
+  };
+
+  // Bulk delete
+  const handleBulkDelete = async () => {
+    setBulkSaving(true);
+    try {
+      const res = await api.post<{ deleted: number; softDeleted: number }>('/numbers/admin/bulk', {
+        ids: Array.from(selected),
+      });
+      const d = res.data;
+      showSnackbar(`Deleted ${(d?.deleted || 0) + (d?.softDeleted || 0)} numbers`, 'success');
+      setBulkDeleteDialog(false);
+      clearSelection();
+      fetchNumbers();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Bulk delete failed';
+      showSnackbar(message, 'error');
+    } finally {
+      setBulkSaving(false);
     }
   };
 
@@ -228,12 +302,45 @@ export default function AdminNumbersPage() {
         </TextField>
       </Box>
 
+      {/* Bulk Action Bar */}
+      {selected.size > 0 && (
+        <Alert
+          severity="info"
+          sx={{ mb: 2, borderRadius: 2, alignItems: 'center' }}
+          action={
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button size="small" variant="outlined" onClick={() => setBulkDialog(true)} sx={{ textTransform: 'none', fontWeight: 600 }}>
+                Bulk Edit
+              </Button>
+              <Button size="small" variant="outlined" color="error" onClick={() => setBulkDeleteDialog(true)} sx={{ textTransform: 'none', fontWeight: 600 }}>
+                Delete
+              </Button>
+              <Button size="small" onClick={clearSelection} sx={{ textTransform: 'none' }}>
+                Clear
+              </Button>
+            </Box>
+          }
+        >
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {selected.size} number{selected.size > 1 ? 's' : ''} selected
+          </Typography>
+        </Alert>
+      )}
+
       {/* Table */}
       <Card sx={{ borderRadius: 3, border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: '#f8f9fb' }}>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={numbers.length > 0 && selected.size === numbers.length}
+                    indeterminate={selected.size > 0 && selected.size < numbers.length}
+                    onChange={toggleSelectAll}
+                    size="small"
+                  />
+                </TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Number</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Area Code</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
@@ -247,19 +354,26 @@ export default function AdminNumbersPage() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
                     <CircularProgress size={32} sx={{ color: '#002664' }} />
                   </TableCell>
                 </TableRow>
               ) : numbers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                  <TableCell colSpan={9} align="center" sx={{ py: 6, color: 'text.secondary' }}>
                     No numbers found
                   </TableCell>
                 </TableRow>
               ) : (
                 numbers.map((num) => (
-                  <TableRow key={num.id} hover>
+                  <TableRow key={num.id} hover selected={selected.has(num.id)}>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selected.has(num.id)}
+                        onChange={() => toggleSelect(num.id)}
+                        size="small"
+                      />
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{num.number}</TableCell>
                     <TableCell>{num.areaCode}</TableCell>
                     <TableCell>
@@ -329,6 +443,121 @@ export default function AdminNumbersPage() {
             disabled={deleting}
           >
             {deleting ? 'Deleting...' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Edit Dialog */}
+      <Dialog open={bulkDialog} onClose={() => setBulkDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>
+          Bulk Edit — {selected.size} Number{selected.size > 1 ? 's' : ''}
+          <Typography variant="body2" color="text.secondary">
+            Only fill fields you want to change. Empty fields will be left unchanged.
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pt: '16px !important' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1a1a2e', mt: 1, mb: -1 }}>
+              Pricing
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Sale Price ($)"
+                type="number"
+                value={bulkForm.basePrice}
+                onChange={(e) => setBulkForm({ ...bulkForm, basePrice: e.target.value })}
+                fullWidth
+                placeholder="Leave empty to skip"
+                slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+              />
+              <TextField
+                label="Monthly ($)"
+                type="number"
+                value={bulkForm.monthlyPrice}
+                onChange={(e) => setBulkForm({ ...bulkForm, monthlyPrice: e.target.value })}
+                fullWidth
+                placeholder="Leave empty to skip"
+                slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+              />
+            </Box>
+            <TextField
+              label="Setup Fee ($)"
+              type="number"
+              value={bulkForm.setupFee}
+              onChange={(e) => setBulkForm({ ...bulkForm, setupFee: e.target.value })}
+              fullWidth
+              placeholder="Leave empty to skip"
+              slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+            />
+
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1a1a2e', mt: 1, mb: -1 }}>
+              Classification
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                select
+                label="Status"
+                value={bulkForm.status}
+                onChange={(e) => setBulkForm({ ...bulkForm, status: e.target.value })}
+                fullWidth
+              >
+                <MenuItem value="">— Don&apos;t change —</MenuItem>
+                <MenuItem value="available">Available</MenuItem>
+                <MenuItem value="sold">Sold</MenuItem>
+                <MenuItem value="reserved">Reserved</MenuItem>
+                <MenuItem value="inactive">Inactive</MenuItem>
+              </TextField>
+              <TextField
+                select
+                label="Number Type"
+                value={bulkForm.numberType}
+                onChange={(e) => setBulkForm({ ...bulkForm, numberType: e.target.value })}
+                fullWidth
+              >
+                <MenuItem value="">— Don&apos;t change —</MenuItem>
+                <MenuItem value="local">Local</MenuItem>
+                <MenuItem value="toll_free">Toll-Free</MenuItem>
+                <MenuItem value="vanity">Vanity</MenuItem>
+              </TextField>
+            </Box>
+            <TextField
+              select
+              label="Premium"
+              value={bulkForm.isPremium}
+              onChange={(e) => setBulkForm({ ...bulkForm, isPremium: e.target.value })}
+              fullWidth
+            >
+              <MenuItem value="">— Don&apos;t change —</MenuItem>
+              <MenuItem value="true">Yes</MenuItem>
+              <MenuItem value="false">No</MenuItem>
+            </TextField>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setBulkDialog(false)} disabled={bulkSaving}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={handleBulkEdit}
+            disabled={bulkSaving}
+            sx={{ bgcolor: '#002664', '&:hover': { bgcolor: '#001a45' } }}
+          >
+            {bulkSaving ? 'Updating...' : `Update ${selected.size} Numbers`}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Delete Confirmation */}
+      <Dialog open={bulkDeleteDialog} onClose={() => setBulkDeleteDialog(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>Delete {selected.size} Numbers</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete <strong>{selected.size} numbers</strong>? Sold numbers will be marked inactive instead.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setBulkDeleteDialog(false)} disabled={bulkSaving}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={handleBulkDelete} disabled={bulkSaving}>
+            {bulkSaving ? 'Deleting...' : `Delete ${selected.size} Numbers`}
           </Button>
         </DialogActions>
       </Dialog>
