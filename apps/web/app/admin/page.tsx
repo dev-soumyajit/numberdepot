@@ -59,9 +59,10 @@ export default function AdminDashboardPage() {
     fetchMetrics();
   }, [showSnackbar]);
 
-  const formatValue = (value: number, format: string) => {
-    if (format === 'currency') return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-    return value.toLocaleString();
+  const formatValue = (value: number | undefined, format: string) => {
+    const v = value ?? 0;
+    if (format === 'currency') return `$${v.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    return v.toLocaleString();
   };
 
   return (

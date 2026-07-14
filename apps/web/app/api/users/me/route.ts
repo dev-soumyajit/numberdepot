@@ -1,30 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
+import bcrypt from 'bcryptjs';
 import { getDb } from '@/lib/db';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'numberdepot_jwt_secret_2024';
+import { requireAuth } from '@/lib/auth-middleware';
+import { apiHandler } from '@/lib/api-handler';
 
 export async function GET(req: NextRequest) {
-  try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const token = authHeader.slice(7);
-    let payload: { userId: string; email: string; role: string };
-
-    try {
-      payload = jwt.verify(token, JWT_SECRET) as typeof payload;
-    } catch {
-      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
-    }
+  return apiHandler(async () => {
+    const payload = requireAuth(req);
 
     const db = await getDb();
     const user = await db.collection('users').findOne({ _id: new ObjectId(payload.userId) });
 
-    if (!user || user.status !== 'active') {
+    if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -34,11 +22,51 @@ export async function GET(req: NextRequest) {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone || '',
+        companyName: user.companyName || '',
         role: user.role,
+        status: user.status,
+        createdAt: user.createdAt?.toISOString?.() || user.createdAt || '',
       },
     });
-  } catch (error) {
-    console.error('Get user error:', error);
-    return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
-  }
+  });
+}
+
+export async function PUT(req: NextRequest) {
+  return apiHandler(async () => {
+    const payload = requireAuth(req);
+    const body = await req.json();
+
+    const db = await getDb();
+    const update: Record<string, unknown> = { updatedAt: new Date() };
+
+    if (body.firstName !== undefined) update.firstName = body.firstName.trim();
+    if (body.lastName !== undefined) update.lastName = body.lastName.trim();
+    if (body.phone !== undefined) update.phone = body.phone.trim();
+    if (body.companyName !== undefined) update.companyName = body.companyName.trim();
+
+    const result = await db.collection('users').findOneAndUpdate(
+      { _id: new ObjectId(payload.userId) },
+      { $set: update },
+      { returnDocument: 'after' }
+    );
+
+    if (!result) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: result._id.toString(),
+        firstName: result.firstName,
+        lastName: result.lastName,
+        email: result.email,
+        phone: result.phone || '',
+        companyName: result.companyName || '',
+        role: result.role,
+        status: result.status,
+      },
+    });
+  });
 }

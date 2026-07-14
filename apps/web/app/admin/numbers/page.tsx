@@ -23,6 +23,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import AddIcon from '@mui/icons-material/Add';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { api } from '@/lib/api';
@@ -36,8 +37,15 @@ interface PhoneNumber {
   source: string;
   status: string;
   basePrice: number;
+  salePrice: number;
   monthlyPrice: number;
+  setupFee: number;
   vanityText?: string;
+  description?: string;
+  city?: string;
+  state?: string;
+  isPremium: boolean;
+  isVanity: boolean;
   createdAt: string;
 }
 
@@ -52,7 +60,7 @@ export default function AdminNumbersPage() {
   const [deleteDialog, setDeleteDialog] = useState<PhoneNumber | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [editDialog, setEditDialog] = useState<PhoneNumber | null>(null);
-  const [editForm, setEditForm] = useState({ basePrice: '', monthlyPrice: '', status: '' });
+  const [editForm, setEditForm] = useState({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', vanityText: '', isPremium: false, description: '' });
   const [saving, setSaving] = useState(false);
 
   const { showSnackbar } = useSnackbar();
@@ -100,9 +108,14 @@ export default function AdminNumbersPage() {
 
   const openEdit = (num: PhoneNumber) => {
     setEditForm({
-      basePrice: String(num.basePrice),
-      monthlyPrice: String(num.monthlyPrice),
+      basePrice: String(num.basePrice || num.salePrice || 0),
+      monthlyPrice: String(num.monthlyPrice || 0),
+      setupFee: String(num.setupFee || 0),
       status: num.status,
+      numberType: num.numberType || 'local',
+      vanityText: num.vanityText || '',
+      isPremium: num.isPremium || false,
+      description: num.description || '',
     });
     setEditDialog(num);
   };
@@ -112,9 +125,14 @@ export default function AdminNumbersPage() {
     setSaving(true);
     try {
       await api.put(`/numbers/admin/${editDialog.id}`, {
-        basePrice: parseFloat(editForm.basePrice),
-        monthlyPrice: parseFloat(editForm.monthlyPrice),
+        basePrice: parseFloat(editForm.basePrice) || 0,
+        monthlyPrice: parseFloat(editForm.monthlyPrice) || 0,
+        setupFee: parseFloat(editForm.setupFee) || 0,
         status: editForm.status,
+        numberType: editForm.numberType,
+        vanityText: editForm.vanityText || undefined,
+        isPremium: editForm.isPremium,
+        description: editForm.description || undefined,
       });
       showSnackbar('Number updated successfully', 'success');
       setEditDialog(null);
@@ -148,20 +166,36 @@ export default function AdminNumbersPage() {
             Manage all platform and broker numbers
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => router.push('/admin/numbers/new')}
-          sx={{
-            bgcolor: '#002664',
-            '&:hover': { bgcolor: '#001a45' },
-            borderRadius: 2,
-            textTransform: 'none',
-            fontWeight: 600,
-          }}
-        >
-          Add Number
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileIcon />}
+            onClick={() => router.push('/admin/numbers/upload')}
+            sx={{
+              borderColor: '#002664',
+              color: '#002664',
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
+          >
+            Bulk Upload
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => router.push('/admin/numbers/new')}
+            sx={{
+              bgcolor: '#002664',
+              '&:hover': { bgcolor: '#001a45' },
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
+          >
+            Add Number
+          </Button>
+        </Box>
       </Box>
 
       {/* Filters */}
@@ -175,8 +209,8 @@ export default function AdminNumbersPage() {
           size="small"
         >
           <MenuItem value="">All Sources</MenuItem>
-          <MenuItem value="platform">Platform</MenuItem>
-          <MenuItem value="broker">Broker</MenuItem>
+          <MenuItem value="inventory">Inventory</MenuItem>
+          <MenuItem value="numberbarn">NumberBarn</MenuItem>
         </TextField>
         <TextField
           select
@@ -236,14 +270,18 @@ export default function AdminNumbersPage() {
                         label={num.source}
                         size="small"
                         sx={{
-                          bgcolor: num.source === 'platform' ? '#00266414' : '#E5393514',
-                          color: num.source === 'platform' ? '#002664' : '#E53935',
+                          bgcolor: num.source === 'inventory' ? '#00266414' : '#E5393514',
+                          color: num.source === 'inventory' ? '#002664' : '#E53935',
                           fontWeight: 600,
                         }}
                       />
                     </TableCell>
-                    <TableCell>${num.basePrice?.toFixed(2)}</TableCell>
-                    <TableCell>${num.monthlyPrice?.toFixed(2)}</TableCell>
+                    <TableCell sx={{ color: (num.basePrice || num.salePrice) ? 'inherit' : 'error.main', fontWeight: (num.basePrice || num.salePrice) ? 400 : 600 }}>
+                      {(num.basePrice || num.salePrice) ? `$${(num.basePrice || num.salePrice).toFixed(2)}` : 'No price'}
+                    </TableCell>
+                    <TableCell sx={{ color: num.monthlyPrice ? 'inherit' : 'text.disabled' }}>
+                      {num.monthlyPrice ? `$${num.monthlyPrice.toFixed(2)}` : '—'}
+                    </TableCell>
                     <TableCell>
                       <Chip label={num.status} size="small" color={getStatusColor(num.status) as any} />
                     </TableCell>
@@ -297,35 +335,104 @@ export default function AdminNumbersPage() {
 
       {/* Edit Dialog */}
       <Dialog open={!!editDialog} onClose={() => setEditDialog(null)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 600 }}>Edit Number: {editDialog?.number}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 600 }}>
+          Edit Number: {editDialog?.number}
+          {editDialog?.city && editDialog?.state && (
+            <Typography variant="body2" color="text.secondary">
+              {editDialog.city}, {editDialog.state}
+            </Typography>
+          )}
+        </DialogTitle>
         <DialogContent sx={{ pt: '16px !important' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+            {/* Pricing */}
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1a1a2e', mt: 1, mb: -1 }}>
+              Pricing
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Sale Price ($)"
+                type="number"
+                value={editForm.basePrice}
+                onChange={(e) => setEditForm({ ...editForm, basePrice: e.target.value })}
+                fullWidth
+                slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+                helperText={!editForm.basePrice || editForm.basePrice === '0' ? 'Price required for listing' : ''}
+                error={!editForm.basePrice || editForm.basePrice === '0'}
+              />
+              <TextField
+                label="Monthly ($)"
+                type="number"
+                value={editForm.monthlyPrice}
+                onChange={(e) => setEditForm({ ...editForm, monthlyPrice: e.target.value })}
+                fullWidth
+                slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+              />
+            </Box>
             <TextField
-              label="Base Price"
+              label="Setup Fee ($)"
               type="number"
-              value={editForm.basePrice}
-              onChange={(e) => setEditForm({ ...editForm, basePrice: e.target.value })}
+              value={editForm.setupFee}
+              onChange={(e) => setEditForm({ ...editForm, setupFee: e.target.value })}
               fullWidth
+              slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+            />
+
+            {/* Classification */}
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1a1a2e', mt: 1, mb: -1 }}>
+              Classification
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                select
+                label="Number Type"
+                value={editForm.numberType}
+                onChange={(e) => setEditForm({ ...editForm, numberType: e.target.value })}
+                fullWidth
+              >
+                <MenuItem value="local">Local</MenuItem>
+                <MenuItem value="toll_free">Toll-Free</MenuItem>
+                <MenuItem value="vanity">Vanity</MenuItem>
+              </TextField>
+              <TextField
+                select
+                label="Status"
+                value={editForm.status}
+                onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                fullWidth
+              >
+                <MenuItem value="available">Available</MenuItem>
+                <MenuItem value="sold">Sold</MenuItem>
+                <MenuItem value="reserved">Reserved</MenuItem>
+                <MenuItem value="inactive">Inactive</MenuItem>
+              </TextField>
+            </Box>
+            <TextField
+              label="Vanity Text"
+              value={editForm.vanityText}
+              onChange={(e) => setEditForm({ ...editForm, vanityText: e.target.value })}
+              fullWidth
+              placeholder="e.g. 1-800-FLOWERS"
             />
             <TextField
-              label="Monthly Price"
-              type="number"
-              value={editForm.monthlyPrice}
-              onChange={(e) => setEditForm({ ...editForm, monthlyPrice: e.target.value })}
+              label="Description"
+              value={editForm.description}
+              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
               fullWidth
+              multiline
+              rows={2}
+              placeholder="Location or description..."
             />
-            <TextField
-              select
-              label="Status"
-              value={editForm.status}
-              onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-              fullWidth
-            >
-              <MenuItem value="available">Available</MenuItem>
-              <MenuItem value="sold">Sold</MenuItem>
-              <MenuItem value="reserved">Reserved</MenuItem>
-              <MenuItem value="inactive">Inactive</MenuItem>
-            </TextField>
+            <Box>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={editForm.isPremium}
+                  onChange={(e) => setEditForm({ ...editForm, isPremium: e.target.checked })}
+                />
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>Premium Number</Typography>
+              </label>
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>

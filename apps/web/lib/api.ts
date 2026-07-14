@@ -548,13 +548,6 @@ async function handleRoute(method: string, endpoint: string, body?: any): Promis
 
 // ── Real API call (for auth endpoints) ──────────────────────────────────────
 
-const REAL_AUTH_ENDPOINTS = ['/auth/login', '/auth/register', '/auth/verify-otp', '/auth/resend-otp', '/auth/forgot-password', '/auth/reset-password', '/auth/logout', '/users/me'];
-
-function isRealAuthEndpoint(endpoint: string): boolean {
-  const path = endpoint.split('?')[0];
-  return REAL_AUTH_ENDPOINTS.some((e) => path === e);
-}
-
 async function realApiCall<T>(method: string, endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -579,6 +572,11 @@ async function realApiCall<T>(method: string, endpoint: string, body?: unknown):
   if (endpoint === '/users/me' && data.user) {
     return { success: true, data: data.user as T };
   }
+
+  // Normalize standard API response shape
+  if (data.success !== undefined) {
+    return data as ApiResponse<T>;
+  }
   return { success: true, data: data as T };
 }
 
@@ -595,18 +593,16 @@ async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<A
     try { body = JSON.parse(options.body); } catch { body = options.body; }
   }
 
-  // Route auth endpoints to real API, fall back to mock on failure
-  if (isRealAuthEndpoint(endpoint)) {
-    try {
-      return await realApiCall<T>(method, endpoint, body);
-    } catch (err) {
-      // If it's a clear auth error (401, 403, 409), don't fall back to mock
-      if (err instanceof ApiError && err.status < 500) {
-        throw err;
-      }
-      // Server error (MongoDB not configured, etc.) — fall back to mock
-      console.warn('[API] Real auth failed, falling back to mock:', (err as Error).message);
+  // Always try real API first, fall back to mock on server errors
+  try {
+    return await realApiCall<T>(method, endpoint, body);
+  } catch (err) {
+    // If it's a clear client error (4xx), don't fall back to mock
+    if (err instanceof ApiError && err.status < 500) {
+      throw err;
     }
+    // Server error or network error — fall back to mock
+    console.warn('[API] Real API failed, falling back to mock:', (err as Error).message);
   }
 
   return handleRoute(method, endpoint, body) as Promise<ApiResponse<T>>;

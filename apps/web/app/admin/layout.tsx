@@ -12,6 +12,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ArticleIcon from '@mui/icons-material/Article';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useAuth } from '@/lib/auth';
 import styles from './layout.module.css';
@@ -23,6 +25,8 @@ const navItems = [
   { label: 'Orders', icon: <ShoppingCartIcon fontSize="small" />, href: '/admin/orders' },
   { label: 'Broker Apps', icon: <AssignmentIndIcon fontSize="small" />, href: '/admin/brokers' },
   { label: 'Commissions', icon: <AccountBalanceWalletIcon fontSize="small" />, href: '/admin/commissions' },
+  { label: 'Pricing', icon: <AttachMoneyIcon fontSize="small" />, href: '/admin/pricing' },
+  { label: 'NumberBarn', icon: <StorefrontIcon fontSize="small" />, href: '/admin/numberbarn' },
   { label: 'Content', icon: <ArticleIcon fontSize="small" />, href: '/admin/content' },
   { label: 'Settings', icon: <SettingsIcon fontSize="small" />, href: '/admin/settings' },
 ];

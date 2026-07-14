@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -24,69 +25,51 @@ import PhoneForwardedIcon from '@mui/icons-material/PhoneForwarded';
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import BusinessIcon from '@mui/icons-material/Business';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { api } from '@/lib/api';
 
-const plans = [
-  {
-    title: 'Park',
-    price: 2.99,
-    icon: <LocalParkingIcon sx={{ fontSize: 44 }} />,
-    color: '#4BA0A1',
-    description: 'Reserve your number and receive voicemail notifications. Perfect for holding a number until you need it.',
-    features: [
-      'Reserve phone number',
-      'Custom voicemail greeting',
-      'Email voicemail notifications',
-      'Number protection',
-      'Online dashboard access',
-    ],
-  },
-  {
-    title: 'Forward',
-    price: 6.99,
-    icon: <PhoneForwardedIcon sx={{ fontSize: 44 }} />,
-    color: '#84BD00',
-    description: 'Forward incoming calls to any phone number. Great for personal or small business use.',
-    features: [
-      'Everything in Park',
-      'Call forwarding to any phone',
-      'Caller ID passthrough',
-      'Scheduled forwarding rules',
-      'Simultaneous ring',
-      'Missed call notifications',
-    ],
-  },
-  {
-    title: 'Unlimited',
-    price: 19.99,
-    icon: <AllInclusiveIcon sx={{ fontSize: 44 }} />,
-    color: '#E53935',
-    popular: true,
-    description: 'Full communication suite with unlimited calling, SMS, and voicemail transcription.',
-    features: [
-      'Everything in Forward',
-      'Unlimited inbound/outbound calls',
-      'SMS and MMS messaging',
-      'Voicemail transcription',
-      'Call recording',
-      'Mobile and desktop apps',
-      'Priority support',
-    ],
-  },
-  {
-    title: 'Business',
-    price: 9.99,
-    icon: <BusinessIcon sx={{ fontSize: 44 }} />,
-    color: '#002664',
-    description: 'Professional features for businesses including auto-attendant, call routing, and analytics.',
-    features: [
-      'Everything in Park',
-      'Auto-attendant / IVR',
-      'Business hours routing',
-      'Call analytics dashboard',
-      'Professional greeting recording',
-      'Multiple extension support',
-    ],
-  },
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const planIcons: Record<string, any> = {
+  park: <LocalParkingIcon sx={{ fontSize: 44 }} />,
+  forward: <PhoneForwardedIcon sx={{ fontSize: 44 }} />,
+  unlimited: <AllInclusiveIcon sx={{ fontSize: 44 }} />,
+  business: <BusinessIcon sx={{ fontSize: 44 }} />,
+};
+
+const planColors: Record<string, string> = {
+  park: '#4BA0A1',
+  forward: '#84BD00',
+  unlimited: '#E53935',
+  business: '#002664',
+};
+
+const planPopular: Record<string, boolean> = { unlimited: true };
+
+const planFeatures: Record<string, string[]> = {
+  park: ['Reserve phone number', 'Custom voicemail greeting', 'Email voicemail notifications', 'Number protection', 'Online dashboard access'],
+  forward: ['Everything in Park', 'Call forwarding to any phone', 'Caller ID passthrough', 'Scheduled forwarding rules', 'Simultaneous ring', 'Missed call notifications'],
+  unlimited: ['Everything in Forward', 'Unlimited inbound/outbound calls', 'SMS and MMS messaging', 'Voicemail transcription', 'Call recording', 'Mobile and desktop apps', 'Priority support'],
+  business: ['Everything in Park', 'Auto-attendant / IVR', 'Business hours routing', 'Call analytics dashboard', 'Professional greeting recording', 'Multiple extension support'],
+};
+
+interface PlanData {
+  id: string;
+  title: string;
+  price: number;
+  description: string;
+}
+
+interface FeeItem {
+  id: string;
+  label: string;
+  amount: number;
+  perItem: boolean;
+}
+
+const fallbackPlans: PlanData[] = [
+  { id: 'park', title: 'Park', price: 2.99, description: 'Reserve your number and receive voicemail notifications. Perfect for holding a number until you need it.' },
+  { id: 'forward', title: 'Forward', price: 6.99, description: 'Forward incoming calls to any phone number. Great for personal or small business use.' },
+  { id: 'unlimited', title: 'Unlimited', price: 19.99, description: 'Full communication suite with unlimited calling, SMS, and voicemail transcription.' },
+  { id: 'business', title: 'Business', price: 9.99, description: 'Professional features for businesses including auto-attendant, call routing, and analytics.' },
 ];
 
 const comparisonFeatures = [
@@ -116,6 +99,32 @@ function FeatureCheck({ included }: { included: boolean }) {
 }
 
 export default function PricingPage() {
+  const [plans, setPlans] = useState<PlanData[]>(fallbackPlans);
+  const [fees, setFees] = useState<FeeItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      api.get<PlanData[]>('/admin/plans').then((res) => {
+        if (res.data) setPlans(res.data);
+      }).catch(() => {}),
+      api.get<FeeItem[]>('/admin/fees').then((res) => {
+        if (Array.isArray(res.data)) setFees(res.data);
+      }).catch(() => {}),
+    ]).finally(() => setLoading(false));
+  }, []);
+
+  const planCards = plans.map((p) => ({
+    ...p,
+    icon: planIcons[p.id] || planIcons.park,
+    color: planColors[p.id] || '#002664',
+    popular: planPopular[p.id] || false,
+    features: planFeatures[p.id] || [],
+  }));
+
+  const getPlanPrice = (id: string) => plans.find((p) => p.id === id)?.price ?? 0;
+  const activeFees = fees.filter((f) => f.amount > 0);
+
   return (
     <Box className="animate-fadeIn">
       {/* Header */}
@@ -167,7 +176,7 @@ export default function PricingPage() {
       {/* Plan Cards */}
       <Container maxWidth="lg" sx={{ mt: -4, mb: 8, position: 'relative', zIndex: 1 }}>
         <Grid container spacing={3}>
-          {plans.map((plan) => (
+          {planCards.map((plan) => (
             <Grid key={plan.title} size={{ xs: 12, sm: 6, md: 3 }}>
               <Card
                 className="card-lift"
@@ -265,13 +274,25 @@ export default function PricingPage() {
         >
           <InfoOutlinedIcon sx={{ color: '#E53935', fontSize: 28, flexShrink: 0 }} />
           <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-              One-Time Setup Fee: $5.00
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              All plans include a one-time setup fee of $5.00 per number. This covers number provisioning,
-              configuration, and initial activation. There are no other hidden fees.
-            </Typography>
+            {activeFees.length > 0 ? (
+              <>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                  Additional Fees
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {activeFees.map((f) => `${f.label}: $${f.amount.toFixed(2)}${f.perItem ? ' per number' : ''}`).join(' | ')}
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                  No Additional Fees
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  All plans are billed monthly with no hidden charges.
+                </Typography>
+              </>
+            )}
           </Box>
         </Box>
       </Container>
@@ -292,13 +313,13 @@ export default function PricingPage() {
                   <TableCell align="center" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>
                     Park<br />
                     <Typography component="span" sx={{ fontSize: '0.8rem', opacity: 0.85 }}>
-                      $2.99/mo
+                      ${getPlanPrice('park').toFixed(2)}/mo
                     </Typography>
                   </TableCell>
                   <TableCell align="center" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>
                     Forward<br />
                     <Typography component="span" sx={{ fontSize: '0.8rem', opacity: 0.85 }}>
-                      $6.99/mo
+                      ${getPlanPrice('forward').toFixed(2)}/mo
                     </Typography>
                   </TableCell>
                   <TableCell
@@ -312,13 +333,13 @@ export default function PricingPage() {
                   >
                     Unlimited<br />
                     <Typography component="span" sx={{ fontSize: '0.8rem', opacity: 0.85 }}>
-                      $19.99/mo
+                      ${getPlanPrice('unlimited').toFixed(2)}/mo
                     </Typography>
                   </TableCell>
                   <TableCell align="center" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>
                     Business<br />
                     <Typography component="span" sx={{ fontSize: '0.8rem', opacity: 0.85 }}>
-                      $9.99/mo
+                      ${getPlanPrice('business').toFixed(2)}/mo
                     </Typography>
                   </TableCell>
                 </TableRow>

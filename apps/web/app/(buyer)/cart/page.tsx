@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Box from '@mui/material/Box';
@@ -18,10 +18,18 @@ import DeleteOutlineIcon from '@mui/icons-material/Delete';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import TimerIcon from '@mui/icons-material/Timer';
 import { useCart } from '@/lib/cart';
 import { useAuth } from '@/lib/auth';
 import { useSnackbar } from '@/lib/snackbar';
 import { api } from '@/lib/api';
+
+interface FeeItem {
+  id: string;
+  label: string;
+  amount: number;
+  perItem: boolean;
+}
 
 function formatPhone(num: string): string {
   const digits = num.replace(/\D/g, '');
@@ -54,6 +62,61 @@ function getPlanColor(plan: string): string {
   }
 }
 
+function useCountdown(expiresAt: string | null) {
+  const [remaining, setRemaining] = useState<number>(0);
+
+  useEffect(() => {
+    if (!expiresAt) { setRemaining(0); return; }
+
+    const update = () => {
+      const ms = new Date(expiresAt).getTime() - Date.now();
+      setRemaining(Math.max(0, Math.floor(ms / 1000)));
+    };
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [expiresAt]);
+
+  const minutes = Math.floor(remaining / 60);
+  const seconds = remaining % 60;
+  const formatted = `${minutes}:${String(seconds).padStart(2, '0')}`;
+  const isUrgent = remaining > 0 && remaining < 120;
+  const isExpired = expiresAt ? remaining <= 0 : false;
+
+  return { remaining, formatted, isUrgent, isExpired };
+}
+
+function ReservationTimer({ expiresAt }: { expiresAt: string | null }) {
+  const { formatted, isUrgent, isExpired } = useCountdown(expiresAt);
+
+  if (!expiresAt) return null;
+
+  if (isExpired) {
+    return (
+      <Chip
+        label="Expired"
+        size="small"
+        color="error"
+        sx={{ fontWeight: 700, fontSize: '0.75rem' }}
+      />
+    );
+  }
+
+  return (
+    <Chip
+      icon={<TimerIcon sx={{ fontSize: 14 }} />}
+      label={`Reserved for ${formatted}`}
+      size="small"
+      sx={{
+        fontWeight: 700,
+        fontSize: '0.75rem',
+        bgcolor: isUrgent ? '#E5393518' : '#4BA0A118',
+        color: isUrgent ? '#E53935' : '#4BA0A1',
+      }}
+    />
+  );
+}
+
 export default function CartPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -61,12 +124,55 @@ export default function CartPage() {
   const { showSnackbar } = useSnackbar();
   const [removing, setRemoving] = useState<string | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
+  const [fees, setFees] = useState<FeeItem[]>([]);
+  const [feesLoaded, setFeesLoaded] = useState(false);
 
   useEffect(() => {
     if (user) {
       refreshCart();
     }
   }, [user, refreshCart]);
+
+  // Fetch checkout fees from admin settings
+  useEffect(() => {
+    api.get<FeeItem[]>('/admin/fees')
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setFees(res.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setFeesLoaded(true));
+  }, []);
+
+  // Watch for expired items
+  const checkExpirations = useCart((s) => s.checkExpirations);
+  useEffect(() => {
+    const id = setInterval(() => {
+      const expiredCount = items.filter(
+        (i) => i.reservedUntil && new Date(i.reservedUntil).getTime() <= Date.now()
+      ).length;
+      if (expiredCount > 0) {
+        checkExpirations();
+        showSnackbar(`${expiredCount} reservation${expiredCount > 1 ? 's' : ''} expired`, 'warning');
+      }
+    }, 5000);
+    return () => clearInterval(id);
+  }, [items, checkExpirations, showSnackbar]);
+
+  const handleExtendTime = useCallback(async () => {
+    try {
+      const inventoryIds = items
+        .filter((i) => i.source === 'inventory' && i.reservedUntil)
+        .map((i) => i.phoneNumberId);
+      if (inventoryIds.length === 0) return;
+      await api.post('/cart/refresh', { numberIds: inventoryIds });
+      await refreshCart();
+      showSnackbar('Reservation time extended', 'success');
+    } catch {
+      showSnackbar('Failed to extend reservation', 'error');
+    }
+  }, [items, refreshCart, showSnackbar]);
 
   if (!user) {
     return (
@@ -95,10 +201,23 @@ export default function CartPage() {
     }
   };
 
+  // Calculate totals dynamically from fees
   const subtotal = items.reduce((sum, i) => sum + i.price, 0);
-  const setupFees = items.reduce((sum, i) => sum + i.setupFee, 0);
-  const monthlyFees = items.reduce((sum, i) => sum + i.monthlyFee, 0);
-  const totalDueToday = subtotal + setupFees + monthlyFees;
+
+  // Calculate each fee's total
+  const activeFees = fees.filter((f) => f.amount > 0);
+  const feeBreakdown = activeFees.map((fee) => ({
+    ...fee,
+    total: fee.perItem ? fee.amount * items.length : fee.amount,
+  }));
+  const totalFees = feeBreakdown.reduce((sum, f) => sum + f.total, 0);
+  const totalDueToday = subtotal + totalFees;
+
+  // Check if any fee is recurring (monthly)
+  const monthlyFees = feeBreakdown.filter((f) =>
+    f.id.includes('month') || f.label.toLowerCase().includes('month') || f.label.toLowerCase().includes('service')
+  );
+  const totalMonthly = monthlyFees.reduce((sum, f) => sum + f.total, 0);
 
   const handleCheckout = async () => {
     setCheckingOut(true);
@@ -108,7 +227,16 @@ export default function CartPage() {
           phoneNumberId: item.phoneNumberId,
           listingId: item.listingId,
           planType: item.planType,
+          source: item.source,
+          number: item.number,
+          numberType: item.numberType,
+          price: item.price,
+          setupFee: item.setupFee,
+          monthlyFee: item.monthlyFee,
+          numberbarnTn: item.numberbarnTn,
+          rawNumber: item.rawNumber,
         })),
+        fees: feeBreakdown.map((f) => ({ id: f.id, label: f.label, amount: f.total })),
       });
 
       if (!orderRes.data?.id) throw new Error('Order creation failed');
@@ -116,8 +244,9 @@ export default function CartPage() {
       const payRes = await api.post<{ success: boolean }>(`/orders/${orderRes.data.id}/pay`);
 
       if (payRes.success) {
-        showSnackbar('Payment successful! Your numbers are being activated.', 'success');
+        localStorage.removeItem('nd_cart');
         await refreshCart();
+        showSnackbar('Payment successful! Your numbers are being activated.', 'success');
         router.push('/account/orders');
       } else {
         throw new Error('Payment failed');
@@ -130,7 +259,7 @@ export default function CartPage() {
     }
   };
 
-  if (cartLoading) {
+  if (cartLoading || !feesLoaded) {
     return (
       <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CircularProgress />
@@ -172,7 +301,7 @@ export default function CartPage() {
           <Grid container spacing={4}>
             {/* Cart Items */}
             <Grid size={{ xs: 12, md: 8 }}>
-              {items.map((item, index) => (
+              {items.map((item) => (
                 <Card key={item.id} sx={{ mb: 2 }}>
                   <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
                     <Box
@@ -197,31 +326,34 @@ export default function CartPage() {
                             size="small"
                             sx={{ fontWeight: 700, fontSize: '0.7rem' }}
                           />
+                          {item.source === 'numberbarn' && (
+                            <Chip
+                              label="NumberBarn"
+                              size="small"
+                              variant="outlined"
+                              sx={{ fontWeight: 600, fontSize: '0.65rem', color: '#666' }}
+                            />
+                          )}
                         </Box>
-                        <Chip
-                          label={`${getPlanLabel(item.planType)} Plan`}
-                          size="small"
-                          sx={{
-                            bgcolor: getPlanColor(item.planType) + '18',
-                            color: getPlanColor(item.planType),
-                            fontWeight: 700,
-                            fontSize: '0.75rem',
-                          }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                          <Chip
+                            label={`${getPlanLabel(item.planType)} Plan`}
+                            size="small"
+                            sx={{
+                              bgcolor: getPlanColor(item.planType) + '18',
+                              color: getPlanColor(item.planType),
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                            }}
+                          />
+                          <ReservationTimer expiresAt={item.reservedUntil} />
+                        </Box>
                       </Box>
 
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <Box sx={{ textAlign: 'right' }}>
-                          {item.price > 0 && (
-                            <Typography variant="body2" color="text.secondary">
-                              Number: ${item.price.toFixed(2)}
-                            </Typography>
-                          )}
-                          <Typography variant="body2" color="text.secondary">
-                            Setup: ${item.setupFee.toFixed(2)}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Monthly: ${item.monthlyFee.toFixed(2)}/mo
+                          <Typography variant="body1" sx={{ fontWeight: 700, color: '#002664' }}>
+                            ${item.price.toFixed(2)}
                           </Typography>
                         </Box>
                         <IconButton
@@ -243,6 +375,21 @@ export default function CartPage() {
                   </CardContent>
                 </Card>
               ))}
+
+              {/* Extend time button */}
+              {items.some((i) => i.reservedUntil) && (
+                <Box sx={{ textAlign: 'center', mt: 1 }}>
+                  <Button
+                    variant="text"
+                    size="small"
+                    startIcon={<TimerIcon />}
+                    onClick={handleExtendTime}
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    Extend Reservation Time
+                  </Button>
+                </Box>
+              )}
             </Grid>
 
             {/* Order Summary */}
@@ -253,6 +400,7 @@ export default function CartPage() {
                     Order Summary
                   </Typography>
 
+                  {/* Subtotal */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
                     <Typography variant="body2" color="text.secondary">
                       Subtotal ({items.length} item{items.length !== 1 ? 's' : ''})
@@ -261,22 +409,23 @@ export default function CartPage() {
                       ${subtotal.toFixed(2)}
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Setup Fees
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      ${setupFees.toFixed(2)}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      First Month Service
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      ${monthlyFees.toFixed(2)}
-                    </Typography>
-                  </Box>
+
+                  {/* Dynamic fees from admin settings */}
+                  {feeBreakdown.map((fee) => (
+                    <Box key={fee.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {fee.label}
+                        {fee.perItem && items.length > 1 && (
+                          <Typography component="span" variant="caption" color="text.disabled">
+                            {' '}(x{items.length})
+                          </Typography>
+                        )}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        ${fee.total.toFixed(2)}
+                      </Typography>
+                    </Box>
+                  ))}
 
                   <Divider sx={{ my: 2 }} />
 
@@ -288,9 +437,17 @@ export default function CartPage() {
                       ${totalDueToday.toFixed(2)}
                     </Typography>
                   </Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 3 }}>
-                    Then ${monthlyFees.toFixed(2)}/mo for ongoing service
-                  </Typography>
+                  {totalMonthly > 0 && (
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 3 }}>
+                      Then ${totalMonthly.toFixed(2)}/mo for ongoing service
+                    </Typography>
+                  )}
+
+                  {items.some((i) => i.source === 'numberbarn') && (
+                    <Typography variant="caption" color="warning.main" sx={{ display: 'block', mb: 2 }}>
+                      NumberBarn numbers: price may change at checkout. Fulfillment may take a few days.
+                    </Typography>
+                  )}
 
                   <Button
                     variant="contained"

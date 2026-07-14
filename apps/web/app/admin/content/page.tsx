@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
@@ -10,7 +9,6 @@ import Button from '@mui/material/Button';
 import ArticleIcon from '@mui/icons-material/Article';
 import DescriptionIcon from '@mui/icons-material/Description';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutlined';
-import InfoIcon from '@mui/icons-material/Info';
 
 const contentSections = [
   {
@@ -18,28 +16,21 @@ const contentSections = [
     description: 'Manage frequently asked questions displayed on the FAQ page.',
     icon: <HelpOutlineIcon sx={{ fontSize: 40 }} />,
     color: '#4BA0A1',
-    href: '/faq',
+    href: '/admin/content/faqs',
   },
   {
-    title: 'About Page',
-    description: 'Edit the About Us page content and team information.',
-    icon: <InfoIcon sx={{ fontSize: 40 }} />,
-    color: '#84BD00',
-    href: '/about',
+    title: 'Static Pages',
+    description: 'Edit About Us, Terms of Service, and Privacy Policy pages.',
+    icon: <DescriptionIcon sx={{ fontSize: 40 }} />,
+    color: '#002664',
+    href: '/admin/content/pages',
   },
   {
     title: 'Blog Posts',
     description: 'Create and manage blog posts for the company blog.',
     icon: <ArticleIcon sx={{ fontSize: 40 }} />,
     color: '#E53935',
-    href: '/blog',
-  },
-  {
-    title: 'Legal Pages',
-    description: 'Edit Terms of Service and Privacy Policy pages.',
-    icon: <DescriptionIcon sx={{ fontSize: 40 }} />,
-    color: '#002664',
-    href: '/terms',
+    href: '/admin/content/blog',
   },
 ];
 
@@ -51,13 +42,13 @@ export default function AdminContentPage() {
           Content Management
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-          Manage static pages and blog content.
+          Manage FAQs, static pages, and blog content.
         </Typography>
       </Box>
 
       <Grid container spacing={3}>
         {contentSections.map((section) => (
-          <Grid key={section.title} size={{ xs: 12, sm: 6 }}>
+          <Grid key={section.title} size={{ xs: 12, sm: 6, md: 4 }}>
             <Card
               sx={{
                 transition: 'transform 0.2s, box-shadow 0.2s',
@@ -88,7 +79,7 @@ export default function AdminContentPage() {
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       {section.description}
                     </Typography>
-                    <Button variant="outlined" size="small">
+                    <Button variant="outlined" size="small" href={section.href}>
                       Manage
                     </Button>
                   </Box>

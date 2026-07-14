@@ -39,11 +39,18 @@ interface PhoneNumber {
   numberType: string;
   areaCode: string;
   salePrice?: number;
+  basePrice?: number;
   licensePrice?: number;
+  monthlyPrice?: number;
+  setupFee?: number;
   vanityText?: string;
   isPremium?: boolean;
   isPortable?: boolean;
   listingId?: string;
+  source?: 'inventory' | 'numberbarn';
+  fulfillmentDays?: number;
+  rawNumber?: string;
+  numberbarnTn?: string;
 }
 
 function formatPhone(num: string): string {
@@ -77,7 +84,8 @@ function SearchPageContent() {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
+  const hasInitialFilters = !!(searchParams.get('area_code') || searchParams.get('number_type') || searchParams.get('price_min') || searchParams.get('price_max'));
+  const [showFilters, setShowFilters] = useState(hasInitialFilters);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
 
   const [areaCodes, setAreaCodes] = useState<{ code: string; count: number }[]>([]);
@@ -154,10 +162,20 @@ function SearchPageContent() {
     }
     setAddingToCart(num.id);
     try {
-      await addItem(num.id, num.listingId, 'park');
+      await addItem(num.id, num.listingId, 'park', {
+        number: num.number,
+        numberType: num.numberType,
+        price: num.salePrice || num.basePrice || 0,
+        setupFee: num.setupFee ?? 9.99,
+        monthlyFee: num.monthlyPrice || 0,
+        source: num.source || 'inventory',
+        numberbarnTn: num.numberbarnTn,
+        rawNumber: num.rawNumber,
+      });
       showSnackbar(`${formatPhone(num.number)} added to cart!`, 'success');
-    } catch {
-      showSnackbar('Failed to add to cart', 'error');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to add to cart';
+      showSnackbar(msg === 'Number is no longer available' ? msg : 'Failed to add to cart', 'error');
     } finally {
       setAddingToCart(null);
     }
@@ -174,7 +192,7 @@ function SearchPageContent() {
     router.push('/search');
   };
 
-  const hasFilters = areaCode || numberType || priceMin || priceMax;
+  const hasActiveFilters = areaCode || numberType || priceMin || priceMax;
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '80vh' }}>
@@ -182,14 +200,14 @@ function SearchPageContent() {
       <Box
         sx={{
           background: 'linear-gradient(135deg, #002664 0%, #001a45 100%)',
-          py: { xs: 4, md: 5 },
-          pb: { xs: 5, md: 6 },
+          py: { xs: 2.5, md: 3 },
+          pb: { xs: 3, md: 3.5 },
         }}
       >
         <Container maxWidth="lg">
           <Typography
-            variant="h3"
-            sx={{ color: '#fff', mb: 3, fontWeight: 800, textAlign: 'center' }}
+            variant="h4"
+            sx={{ color: '#fff', mb: 2, fontWeight: 800, textAlign: 'center', fontSize: { xs: '1.5rem', md: '1.75rem' } }}
           >
             Browse Phone Numbers
           </Typography>
@@ -209,20 +227,21 @@ function SearchPageContent() {
               placeholder="Search by number, area code, or keyword..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              size="small"
               slotProps={{
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary' }} />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 },
               }}
               sx={{
                 bgcolor: '#fff',
-                borderRadius: 2.5,
+                borderRadius: 2,
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 2.5,
+                  borderRadius: 2,
                   '& fieldset': { border: 'none' },
                 },
               }}
@@ -231,24 +250,24 @@ function SearchPageContent() {
               type="submit"
               variant="contained"
               color="secondary"
-              size="large"
-              sx={{ px: 4, minWidth: 120, borderRadius: 2.5 }}
+              sx={{ px: 3, minWidth: 100, borderRadius: 2 }}
             >
               Search
             </Button>
             <Button
               onClick={() => setShowFilters(!showFilters)}
               variant="outlined"
+              size="small"
               startIcon={<FilterListIcon />}
               sx={{
                 color: '#fff',
                 borderColor: 'rgba(255,255,255,0.4)',
                 '&:hover': { borderColor: '#fff', bgcolor: 'rgba(255,255,255,0.08)' },
-                minWidth: 120,
-                borderRadius: 2.5,
+                minWidth: 100,
+                borderRadius: 2,
               }}
             >
-              Filters {hasFilters ? '(on)' : ''}
+              Filters {hasActiveFilters ? '(on)' : ''}
             </Button>
           </Box>
         </Container>
@@ -381,7 +400,7 @@ function SearchPageContent() {
               : `${totalResults} number${totalResults !== 1 ? 's' : ''} found`}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {hasFilters && (
+            {hasActiveFilters && (
               <Button size="small" startIcon={<CloseIcon />} onClick={clearFilters}>
                 Clear Filters
               </Button>
@@ -461,6 +480,19 @@ function SearchPageContent() {
                             }}
                           />
                         )}
+                        {num.source === 'numberbarn' && (
+                          <Chip
+                            label="NumberBarn"
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              fontWeight: 600,
+                              fontSize: '0.65rem',
+                              color: '#666',
+                              borderColor: '#ccc',
+                            }}
+                          />
+                        )}
                       </Box>
                       <Typography
                         component={Link}
@@ -485,6 +517,11 @@ function SearchPageContent() {
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                         Area Code: {num.areaCode}
                       </Typography>
+                      {num.source === 'numberbarn' && num.fulfillmentDays && (
+                        <Typography variant="caption" color="text.secondary">
+                          ~{num.fulfillmentDays} day{num.fulfillmentDays !== 1 ? 's' : ''} fulfillment
+                        </Typography>
+                      )}
                       <Typography
                         variant="h6"
                         sx={{ mt: 1.5, color: '#84BD00', fontWeight: 700, fontSize: '1.1rem' }}
