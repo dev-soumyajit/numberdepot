@@ -34,10 +34,25 @@ import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import BusinessIcon from '@mui/icons-material/Business';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CircularProgress from '@mui/material/CircularProgress';
 import { api } from '@/lib/api';
 import { useCart } from '@/lib/cart';
 import { useAuth } from '@/lib/auth';
 import { useSnackbar } from '@/lib/snackbar';
+
+interface FeeItem {
+  id: string;
+  label: string;
+  amount: number;
+  perItem: boolean;
+}
+
+interface PlanData {
+  id: string;
+  title: string;
+  price: number;
+  description: string;
+}
 
 interface NumberDetail {
   id: string;
@@ -62,43 +77,26 @@ interface NumberDetail {
   relatedNumbers?: NumberDetail[];
 }
 
-const planDetails = [
-  {
-    key: 'park',
-    label: 'Park',
-    price: 2.99,
-    icon: <LocalParkingIcon />,
-    color: '#4BA0A1',
-    description: 'Reserve the number with voicemail greeting and email notifications.',
-    features: ['Custom voicemail greeting', 'Email notifications', 'Number protection'],
-  },
-  {
-    key: 'forward',
-    label: 'Forward',
-    price: 6.99,
-    icon: <PhoneForwardedIcon />,
-    color: '#84BD00',
-    description: 'Forward incoming calls to any phone number of your choice.',
-    features: ['Forward to any phone', 'Caller ID passthrough', 'Scheduled forwarding', 'All Park features'],
-  },
-  {
-    key: 'unlimited',
-    label: 'Unlimited',
-    price: 19.99,
-    icon: <AllInclusiveIcon />,
-    color: '#E53935',
-    description: 'Full calling and SMS capabilities with voicemail to email.',
-    features: ['Unlimited calling', 'SMS messaging', 'Voicemail to email', 'All Forward features'],
-  },
-  {
-    key: 'business',
-    label: 'Business',
-    price: 9.99,
-    icon: <BusinessIcon />,
-    color: '#002664',
-    description: 'Professional features including auto-attendant and call analytics.',
-    features: ['Auto-attendant', 'Business hours routing', 'Call analytics', 'Professional greeting'],
-  },
+const planIcons: Record<string, React.ReactNode> = {
+  park: <LocalParkingIcon />,
+  forward: <PhoneForwardedIcon />,
+  unlimited: <AllInclusiveIcon />,
+  business: <BusinessIcon />,
+};
+const planColors: Record<string, string> = {
+  park: '#4BA0A1', forward: '#84BD00', unlimited: '#E53935', business: '#002664',
+};
+const planFeatures: Record<string, string[]> = {
+  park: ['Custom voicemail greeting', 'Email notifications', 'Number protection'],
+  forward: ['Forward to any phone', 'Caller ID passthrough', 'Scheduled forwarding', 'All Park features'],
+  unlimited: ['Unlimited calling', 'SMS messaging', 'Voicemail to email', 'All Forward features'],
+  business: ['Auto-attendant', 'Business hours routing', 'Call analytics', 'Professional greeting'],
+};
+const defaultPlans: PlanData[] = [
+  { id: 'park', title: 'Park', price: 2.99, description: 'Reserve the number with voicemail greeting and email notifications.' },
+  { id: 'forward', title: 'Forward', price: 6.99, description: 'Forward incoming calls to any phone number of your choice.' },
+  { id: 'unlimited', title: 'Unlimited', price: 19.99, description: 'Full calling and SMS capabilities with voicemail to email.' },
+  { id: 'business', title: 'Business', price: 9.99, description: 'Professional features including auto-attendant and call analytics.' },
 ];
 
 function formatPhone(num: string): string {
@@ -137,6 +135,18 @@ export default function NumberDetailPage() {
   const [offerAmount, setOfferAmount] = useState('');
   const [offerMessage, setOfferMessage] = useState('');
   const [submittingOffer, setSubmittingOffer] = useState(false);
+  const [plans, setPlans] = useState<PlanData[]>(defaultPlans);
+  const [fees, setFees] = useState<FeeItem[]>([]);
+
+  // Fetch plans and fees from admin settings
+  useEffect(() => {
+    api.get<PlanData[]>('/admin/plans').then((res) => {
+      if (res.data && res.data.length > 0) setPlans(res.data);
+    }).catch(() => {});
+    api.get<FeeItem[]>('/admin/fees').then((res) => {
+      if (Array.isArray(res.data)) setFees(res.data);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!params.id) return;
@@ -215,7 +225,9 @@ export default function NumberDetailPage() {
     }
   };
 
-  const activePlan = planDetails.find((p) => p.key === selectedPlan)!;
+  const activePlanData = plans.find((p) => p.id === selectedPlan) || plans[0];
+  const activeFees = fees.filter((f) => f.amount > 0);
+  const totalFees = activeFees.reduce((sum, f) => sum + f.amount, 0);
 
   if (loading) {
     return (
@@ -387,14 +399,16 @@ export default function NumberDetailPage() {
                       </Typography>
                     </Box>
                   )}
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                      Setup Fee (one-time)
-                    </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                      $5.00
-                    </Typography>
-                  </Box>
+                  {activeFees.map((fee) => (
+                    <Box key={fee.id}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                        {fee.label} {fee.perItem ? '(per number)' : '(one-time)'}
+                      </Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                        ${fee.amount.toFixed(2)}
+                      </Typography>
+                    </Box>
+                  ))}
                 </Box>
               </CardContent>
             </Card>
@@ -416,51 +430,55 @@ export default function NumberDetailPage() {
                   fullWidth
                   sx={{ mb: 3 }}
                 >
-                  {planDetails.map((plan) => (
-                    <ToggleButton
-                      key={plan.key}
-                      value={plan.key}
-                      sx={{
-                        py: 2,
-                        px: 2.5,
-                        justifyContent: 'flex-start',
-                        gap: 2,
-                        textAlign: 'left',
-                        textTransform: 'none',
-                        border: '1px solid',
-                        borderColor: selectedPlan === plan.key ? plan.color : 'divider',
-                        bgcolor: selectedPlan === plan.key ? plan.color + '08' : 'transparent',
-                        '&.Mui-selected': {
-                          bgcolor: plan.color + '10',
-                          borderColor: plan.color,
-                          '&:hover': { bgcolor: plan.color + '15' },
-                        },
-                      }}
-                    >
-                      <Box sx={{ color: plan.color }}>{plan.icon}</Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                          {plan.label}
+                  {plans.map((plan) => {
+                    const color = planColors[plan.id] || '#002664';
+                    const icon = planIcons[plan.id] || <PhoneIcon />;
+                    return (
+                      <ToggleButton
+                        key={plan.id}
+                        value={plan.id}
+                        sx={{
+                          py: 2,
+                          px: 2.5,
+                          justifyContent: 'flex-start',
+                          gap: 2,
+                          textAlign: 'left',
+                          textTransform: 'none',
+                          border: '1px solid',
+                          borderColor: selectedPlan === plan.id ? color : 'divider',
+                          bgcolor: selectedPlan === plan.id ? color + '08' : 'transparent',
+                          '&.Mui-selected': {
+                            bgcolor: color + '10',
+                            borderColor: color,
+                            '&:hover': { bgcolor: color + '15' },
+                          },
+                        }}
+                      >
+                        <Box sx={{ color }}>{icon}</Box>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                            {plan.title}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {plan.description}
+                          </Typography>
+                        </Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color }}>
+                          ${plan.price.toFixed(2)}/mo
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {plan.description}
-                        </Typography>
-                      </Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: plan.color }}>
-                        ${plan.price.toFixed(2)}/mo
-                      </Typography>
-                    </ToggleButton>
-                  ))}
+                      </ToggleButton>
+                    );
+                  })}
                 </ToggleButtonGroup>
 
                 {/* Plan Features */}
                 <Box sx={{ mb: 3, pl: 1 }}>
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {activePlan.label} Plan Includes:
+                    {activePlanData?.title || 'Park'} Plan Includes:
                   </Typography>
-                  {activePlan.features.map((feature) => (
+                  {(planFeatures[selectedPlan] || []).map((feature) => (
                     <Box key={feature} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.75 }}>
-                      <CheckCircleIcon sx={{ fontSize: 16, color: activePlan.color }} />
+                      <CheckCircleIcon sx={{ fontSize: 16, color: planColors[selectedPlan] || '#002664' }} />
                       <Typography variant="body2" color="text.secondary">
                         {feature}
                       </Typography>
@@ -478,19 +496,21 @@ export default function NumberDetailPage() {
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>${number.salePrice.toFixed(2)}</Typography>
                     </Box>
                   )}
+                  {activeFees.map((fee) => (
+                    <Box key={fee.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                      <Typography variant="body2" color="text.secondary">{fee.label}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>${fee.amount.toFixed(2)}</Typography>
+                    </Box>
+                  ))}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" color="text.secondary">Setup Fee</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>$5.00</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="body2" color="text.secondary">Monthly ({activePlan.label})</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>${activePlan.price.toFixed(2)}/mo</Typography>
+                    <Typography variant="body2" color="text.secondary">Monthly ({activePlanData?.title || 'Park'})</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>${(activePlanData?.price || 0).toFixed(2)}/mo</Typography>
                   </Box>
                   <Divider sx={{ my: 1.5 }} />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Due Today</Typography>
                     <Typography variant="subtitle1" color="primary.main" sx={{ fontWeight: 800 }}>
-                      ${((number.salePrice || 0) + 5.00 + activePlan.price).toFixed(2)}
+                      ${((number.salePrice || 0) + totalFees + (activePlanData?.price || 0)).toFixed(2)}
                     </Typography>
                   </Box>
                 </Box>
