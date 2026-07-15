@@ -39,24 +39,46 @@ export async function GET(req: NextRequest) {
       if (priceMax) filter.price.$lte = dollarsToCents(parseFloat(priceMax));
     }
 
-    // Text/number search
+    // Text/number search — improved for accuracy
     if (q) {
       const digits = q.replace(/\D/g, '');
+      const letters = q.replace(/[^a-zA-Z]/g, '');
+      const conditions: Record<string, unknown>[] = [];
 
-      if (digits.length >= 3 && digits.length <= 11) {
-        // Numeric search — area code or partial number
-        // Use regex anchored to start for index efficiency
-        if (digits.length === 3 && !areaCode) {
-          // Likely an area code search — use exact match on indexed field
+      // Digit-based search on the `number` field (stored as E.164: "12125551234")
+      if (digits.length >= 2 && digits.length <= 11) {
+        if (digits.length === 3 && !areaCode && !letters) {
+          // Pure 3-digit query without letters — area code search
           filter.areaCode = digits;
+        } else if (digits.length === 10) {
+          // Full 10-digit number — match with or without leading country code "1"
+          conditions.push({ number: { $regex: `1?${digits}$` } });
+        } else if (digits.length === 11 && digits.startsWith('1')) {
+          // Full 11-digit E.164 — exact suffix match
+          conditions.push({ number: digits });
         } else {
-          // Partial number search — regex on the indexed 'number' field
-          filter.number = { $regex: digits };
+          // Partial digits — substring match on number
+          conditions.push({ number: { $regex: digits } });
         }
-      } else if (q.length >= 2) {
-        // Text search (vanity text, etc.) — use MongoDB text index
-        // $text uses the text index for fast full-text search
-        filter.$text = { $search: q };
+      }
+
+      // Letter-based search on vanityText and formattedNumber (partial, case-insensitive)
+      if (letters.length >= 2) {
+        const escaped = letters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        conditions.push({ vanityText: { $regex: escaped, $options: 'i' } });
+      }
+
+      // Full query search on formattedNumber (handles "(212) 555-1234" style)
+      if (q.length >= 2 && /[()-\s]/.test(q)) {
+        const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        conditions.push({ formattedNumber: { $regex: escaped, $options: 'i' } });
+      }
+
+      // Combine conditions with $or (if we have conditions and didn't set areaCode directly)
+      if (conditions.length === 1) {
+        Object.assign(filter, conditions[0]);
+      } else if (conditions.length > 1) {
+        filter.$or = conditions;
       }
     }
 
@@ -69,21 +91,8 @@ export async function GET(req: NextRequest) {
       case 'newest': sortObj = { createdAt: -1 }; break;
     }
 
-    // If text search, add textScore sort
-    const hasTextSearch = '$text' in filter;
-    const projection = hasTextSearch
-      ? { score: { $meta: 'textScore' } as unknown as number }
-      : undefined;
-
-    if (hasTextSearch && sort === 'price_asc') {
-      // For text search, sort by relevance first
-      sortObj = { score: { $meta: 'textScore' } as unknown as -1, price: 1 };
-    }
-
     const [results, total] = await Promise.all([
-      projection
-        ? col.find(filter).project({ ...projection }).sort(sortObj).skip(skip).limit(limit).toArray()
-        : col.find(filter).sort(sortObj).skip(skip).limit(limit).toArray(),
+      col.find(filter).sort(sortObj).skip(skip).limit(limit).toArray(),
       col.countDocuments(filter),
     ]);
 
@@ -94,8 +103,23 @@ export async function GET(req: NextRequest) {
     // NumberBarn fallback: only when inventory results < limit AND user searched something
     if (results.length < limit && (areaCode || q)) {
       try {
+        // Extract a valid NPA (area code) for NumberBarn: only use digits if they look like an area code
+        let nbNpa = areaCode || undefined;
+        const qDigits = q ? q.replace(/\D/g, '') : '';
+        if (!nbNpa && qDigits.length >= 3) {
+          // If 10+ digits, first 3 (after stripping country code) are area code
+          if (qDigits.length >= 10) {
+            const d = qDigits.length === 11 && qDigits.startsWith('1') ? qDigits.slice(1) : qDigits;
+            nbNpa = d.slice(0, 3);
+          } else if (qDigits.length === 3) {
+            // Exactly 3 digits = area code
+            nbNpa = qDigits;
+          }
+          // For 4-9 digits, don't guess area code — it could be partial number
+        }
+
         const nbResults = await nbSearch({
-          npa: areaCode || (q ? q.replace(/\D/g, '').slice(0, 3) : undefined),
+          npa: nbNpa,
           search: q && /[a-zA-Z]/.test(q) ? q : undefined,
           limit: limit - results.length,
           priceMin: priceMin ? dollarsToCents(parseFloat(priceMin)) : undefined,

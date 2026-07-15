@@ -41,6 +41,9 @@ export async function ensureIndexes(): Promise<void> {
       { name: 'numbers_text_search' }
     ),
 
+    // Vanity text for regex searches
+    numbersColl.createIndex({ vanityText: 1 }, { sparse: true }),
+
     // Reservation TTL — auto-deletes expired reservations
     numbersColl.createIndex(
       { reservationExpiresAt: 1 },
