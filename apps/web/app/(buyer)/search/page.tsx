@@ -99,6 +99,17 @@ function SearchPageContent() {
   const [sort, setSort] = useState(searchParams.get('sort') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
 
+  // Sync state when URL params change (e.g. navigating from /local area code chips)
+  useEffect(() => {
+    setQuery(searchParams.get('q') || '');
+    setAreaCode(searchParams.get('area_code') || '');
+    setNumberType(searchParams.get('number_type') || '');
+    setPriceMin(searchParams.get('price_min') || '');
+    setPriceMax(searchParams.get('price_max') || '');
+    setSort(searchParams.get('sort') || '');
+    setPage(Number(searchParams.get('page')) || 1);
+  }, [searchParams]);
+
   const fetchNumbers = useCallback(async () => {
     setLoading(true);
     try {

@@ -1,15 +1,45 @@
-version: '3.8'
-
 services:
+  # MongoDB Database
+  mongo:
+    image: mongo:8
+    container_name: numberdepot-db
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS:-changeme_strong_password}
+      MONGO_INITDB_DATABASE: numberdepot
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js App
   web:
     build:
-      context: ./apps/web
+      context: .
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - MONGODB_URI=${MONGODB_URI}
-      - RESEND_API_KEY=${RESEND_API_KEY}
-      - JWT_SECRET=${JWT_SECRET}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      args:
+        MONGODB_URI: mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-changeme_strong_password}@mongo:27017/numberdepot?authSource=admin
+        RESEND_API_KEY: ${RESEND_API_KEY}
+        JWT_SECRET: ${JWT_SECRET}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    container_name: numberdepot-web
     restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      MONGODB_URI: mongodb://${MONGO_USER:-admin}:${MONGO_PASS:-changeme_strong_password}@mongo:27017/numberdepot?authSource=admin
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo_data:
