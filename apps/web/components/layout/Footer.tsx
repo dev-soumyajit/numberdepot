@@ -102,6 +102,13 @@ export default function Footer() {
             <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none', fontSize: '0.75rem', opacity: 0.5 }}>Privacy</Link>
           </Box>
         </Box>
+
+        <Typography variant="caption" sx={{ display: 'block', textAlign: 'right', mt: 2, opacity: 0.3, fontSize: '0.65rem' }}>
+          Developed by{' '}
+          <a href="https://www.linkedin.com/in/soumyajit-khan-48517a22a/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>
+            Soumyajit
+          </a>
+        </Typography>
       </Container>
     </Box>
   );
