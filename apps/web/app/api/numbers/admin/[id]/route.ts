@@ -34,6 +34,8 @@ export async function PUT(
       update.isVanity = !!body.vanityText;
     }
     if (body.numberType !== undefined) update.numberType = body.numberType;
+    if (body.allowOffers !== undefined) update.allowOffers = body.allowOffers;
+    if (body.minimumOffer !== undefined) update.minimumOffer = body.minimumOffer !== null ? dollarsToCents(body.minimumOffer) : undefined;
 
     const result = await col.findOneAndUpdate(
       { _id: new ObjectId(id) },

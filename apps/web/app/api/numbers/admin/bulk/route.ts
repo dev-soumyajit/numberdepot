@@ -48,6 +48,9 @@ export async function PUT(req: NextRequest) {
     if (updates.isPremium !== undefined && updates.isPremium !== '') {
       $set.isPremium = updates.isPremium === true || updates.isPremium === 'true';
     }
+    if (updates.allowOffers !== undefined && updates.allowOffers !== '') {
+      $set.allowOffers = updates.allowOffers === true || updates.allowOffers === 'true';
+    }
 
     // Only updatedAt means nothing to update
     if (Object.keys($set).length <= 1) {

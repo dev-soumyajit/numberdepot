@@ -16,6 +16,8 @@ export interface NumberDoc {
   status: 'available' | 'reserved' | 'sold' | 'inactive';
   isVanity: boolean;
   isPremium: boolean;
+  allowOffers?: boolean;
+  minimumOffer?: number; // cents
   features: string[];
   description?: string;
   city?: string;

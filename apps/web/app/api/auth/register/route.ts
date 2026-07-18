@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ObjectId } from 'mongodb';
 import bcrypt from 'bcryptjs';
 import { getDb } from '@/lib/db';
 import { sendOTP } from '@/lib/resend';
@@ -15,24 +16,34 @@ export async function POST(req: NextRequest) {
     const users = db.collection('users');
 
     const existing = await users.findOne({ email: email.toLowerCase() });
-    if (existing) {
+
+    if (existing && existing.status !== 'pending_verification') {
       return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    let userId: string;
 
-    const user = {
-      firstName,
-      lastName,
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      role: role === 'seller' ? 'seller' : 'buyer',
-      status: 'pending_verification',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const result = await users.insertOne(user);
+    if (existing) {
+      // Unverified user re-registering — update their details
+      await users.updateOne(
+        { _id: existing._id },
+        { $set: { firstName, lastName, password: hashedPassword, role: role === 'seller' ? 'seller' : 'buyer', updatedAt: new Date() } }
+      );
+      userId = existing._id.toString();
+    } else {
+      const result = await users.insertOne({
+        firstName,
+        lastName,
+        email: email.toLowerCase(),
+        password: hashedPassword,
+        role: role === 'seller' ? 'seller' : 'buyer',
+        status: 'pending_verification',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      userId = result.insertedId.toString();
+    }
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -44,7 +55,7 @@ export async function POST(req: NextRequest) {
     await otps.insertOne({
       email: email.toLowerCase(),
       otp,
-      userId: result.insertedId,
+      userId: new ObjectId(userId),
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
     });
@@ -56,7 +67,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       message: 'Registration successful. Please verify your email.',
-      userId: result.insertedId.toString(),
+      userId,
       email: email.toLowerCase(),
     });
   } catch (error) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -24,10 +24,12 @@ import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import Checkbox from '@mui/material/Checkbox';
 import Alert from '@mui/material/Alert';
+import InputAdornment from '@mui/material/InputAdornment';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 import { api } from '@/lib/api';
 import { useSnackbar } from '@/lib/snackbar';
 
@@ -48,6 +50,8 @@ interface PhoneNumber {
   state?: string;
   isPremium: boolean;
   isVanity: boolean;
+  allowOffers: boolean;
+  minimumOffer: number;
   createdAt: string;
 }
 
@@ -59,19 +63,34 @@ export default function AdminNumbersPage() {
   const [total, setTotal] = useState(0);
   const [sourceFilter, setSourceFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [areaCodeFilter, setAreaCodeFilter] = useState('');
+  const [numberTypeFilter, setNumberTypeFilter] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
   const [deleteDialog, setDeleteDialog] = useState<PhoneNumber | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [editDialog, setEditDialog] = useState<PhoneNumber | null>(null);
-  const [editForm, setEditForm] = useState({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', vanityText: '', isPremium: false, description: '' });
+  const [editForm, setEditForm] = useState({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', vanityText: '', isPremium: false, description: '', allowOffers: true, minimumOffer: '' });
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkDialog, setBulkDialog] = useState(false);
   const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
-  const [bulkForm, setBulkForm] = useState({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', isPremium: '' });
+  const [bulkForm, setBulkForm] = useState({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', isPremium: '', allowOffers: '' });
   const [bulkSaving, setBulkSaving] = useState(false);
 
   const { showSnackbar } = useSnackbar();
   const router = useRouter();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Debounce search query
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      setPage(0);
+    }, 400);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchQuery]);
 
   const fetchNumbers = useCallback(async () => {
     setLoading(true);
@@ -81,6 +100,10 @@ export default function AdminNumbersPage() {
       params.set('limit', String(limit));
       if (sourceFilter) params.set('source', sourceFilter);
       if (statusFilter) params.set('status', statusFilter);
+      if (debouncedQuery) params.set('q', debouncedQuery);
+      if (areaCodeFilter) params.set('area_code', areaCodeFilter);
+      if (numberTypeFilter) params.set('number_type', numberTypeFilter);
+      if (sortBy) params.set('sort', sortBy);
 
       const res = await api.get<PhoneNumber[]>(`/numbers/admin/all?${params}`);
       if (res.data) setNumbers(res.data);
@@ -91,7 +114,7 @@ export default function AdminNumbersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, sourceFilter, statusFilter, showSnackbar]);
+  }, [page, limit, sourceFilter, statusFilter, debouncedQuery, areaCodeFilter, numberTypeFilter, sortBy, showSnackbar]);
 
   useEffect(() => {
     fetchNumbers();
@@ -124,6 +147,8 @@ export default function AdminNumbersPage() {
       vanityText: num.vanityText || '',
       isPremium: num.isPremium || false,
       description: num.description || '',
+      allowOffers: num.allowOffers ?? true,
+      minimumOffer: num.minimumOffer ? String(num.minimumOffer) : '',
     });
     setEditDialog(num);
   };
@@ -141,6 +166,8 @@ export default function AdminNumbersPage() {
         vanityText: editForm.vanityText || undefined,
         isPremium: editForm.isPremium,
         description: editForm.description || undefined,
+        allowOffers: editForm.allowOffers,
+        minimumOffer: editForm.minimumOffer ? parseFloat(editForm.minimumOffer) : null,
       });
       showSnackbar('Number updated successfully', 'success');
       setEditDialog(null);
@@ -181,6 +208,7 @@ export default function AdminNumbersPage() {
       if (bulkForm.status) updates.status = bulkForm.status;
       if (bulkForm.numberType) updates.numberType = bulkForm.numberType;
       if (bulkForm.isPremium !== '') updates.isPremium = bulkForm.isPremium === 'true';
+      if (bulkForm.allowOffers !== '') updates.allowOffers = bulkForm.allowOffers === 'true';
 
       const res = await api.put<{ matched: number; modified: number }>('/numbers/admin/bulk', {
         ids: Array.from(selected),
@@ -188,7 +216,7 @@ export default function AdminNumbersPage() {
       });
       showSnackbar(`${res.data?.modified || 0} numbers updated`, 'success');
       setBulkDialog(false);
-      setBulkForm({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', isPremium: '' });
+      setBulkForm({ basePrice: '', monthlyPrice: '', setupFee: '', status: '', numberType: '', isPremium: '', allowOffers: '' });
       clearSelection();
       fetchNumbers();
     } catch (err: unknown) {
@@ -234,7 +262,7 @@ export default function AdminNumbersPage() {
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a2e' }}>
-            Numbers Management
+            Numbers Management{total > 0 && !loading ? ` (${total.toLocaleString()})` : ''}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
             Manage all platform and broker numbers
@@ -272,6 +300,25 @@ export default function AdminNumbersPage() {
         </Box>
       </Box>
 
+      {/* Search */}
+      <TextField
+        placeholder="Search by number, vanity text..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        fullWidth
+        size="small"
+        sx={{ mb: 2 }}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: 'text.disabled' }} />
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+
       {/* Filters */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
         <TextField
@@ -299,6 +346,40 @@ export default function AdminNumbersPage() {
           <MenuItem value="sold">Sold</MenuItem>
           <MenuItem value="reserved">Reserved</MenuItem>
           <MenuItem value="inactive">Inactive</MenuItem>
+        </TextField>
+        <TextField
+          label="Area Code"
+          value={areaCodeFilter}
+          onChange={(e) => { setAreaCodeFilter(e.target.value.replace(/\D/g, '').slice(0, 3)); setPage(0); }}
+          sx={{ width: 120 }}
+          size="small"
+          placeholder="e.g. 212"
+        />
+        <TextField
+          select
+          label="Number Type"
+          value={numberTypeFilter}
+          onChange={(e) => { setNumberTypeFilter(e.target.value); setPage(0); }}
+          sx={{ minWidth: 160 }}
+          size="small"
+        >
+          <MenuItem value="">All Types</MenuItem>
+          <MenuItem value="local">Local</MenuItem>
+          <MenuItem value="toll_free">Toll-Free</MenuItem>
+          <MenuItem value="vanity">Vanity</MenuItem>
+        </TextField>
+        <TextField
+          select
+          label="Sort By"
+          value={sortBy}
+          onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
+          sx={{ minWidth: 160 }}
+          size="small"
+        >
+          <MenuItem value="newest">Newest First</MenuItem>
+          <MenuItem value="price_asc">Price: Low to High</MenuItem>
+          <MenuItem value="price_desc">Price: High to Low</MenuItem>
+          <MenuItem value="area_code">Area Code</MenuItem>
         </TextField>
       </Box>
 
@@ -520,17 +601,30 @@ export default function AdminNumbersPage() {
                 <MenuItem value="vanity">Vanity</MenuItem>
               </TextField>
             </Box>
-            <TextField
-              select
-              label="Premium"
-              value={bulkForm.isPremium}
-              onChange={(e) => setBulkForm({ ...bulkForm, isPremium: e.target.value })}
-              fullWidth
-            >
-              <MenuItem value="">— Don&apos;t change —</MenuItem>
-              <MenuItem value="true">Yes</MenuItem>
-              <MenuItem value="false">No</MenuItem>
-            </TextField>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                select
+                label="Premium"
+                value={bulkForm.isPremium}
+                onChange={(e) => setBulkForm({ ...bulkForm, isPremium: e.target.value })}
+                fullWidth
+              >
+                <MenuItem value="">— Don&apos;t change —</MenuItem>
+                <MenuItem value="true">Yes</MenuItem>
+                <MenuItem value="false">No</MenuItem>
+              </TextField>
+              <TextField
+                select
+                label="Allow Offers"
+                value={bulkForm.allowOffers}
+                onChange={(e) => setBulkForm({ ...bulkForm, allowOffers: e.target.value })}
+                fullWidth
+              >
+                <MenuItem value="">— Don&apos;t change —</MenuItem>
+                <MenuItem value="true">Yes</MenuItem>
+                <MenuItem value="false">No</MenuItem>
+              </TextField>
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
@@ -662,6 +756,33 @@ export default function AdminNumbersPage() {
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>Premium Number</Typography>
               </label>
             </Box>
+
+            {/* Offer Settings */}
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1a1a2e', mt: 1, mb: -1 }}>
+              Offer Settings
+            </Typography>
+            <Box>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={editForm.allowOffers}
+                  onChange={(e) => setEditForm({ ...editForm, allowOffers: e.target.checked })}
+                />
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>Allow Offers</Typography>
+              </label>
+            </Box>
+            {editForm.allowOffers && (
+              <TextField
+                label="Minimum Offer ($)"
+                type="number"
+                value={editForm.minimumOffer}
+                onChange={(e) => setEditForm({ ...editForm, minimumOffer: e.target.value })}
+                fullWidth
+                slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+                placeholder="Leave empty for 70% of sale price"
+                helperText="Minimum amount buyers can offer. Defaults to 70% of sale price if empty."
+              />
+            )}
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
