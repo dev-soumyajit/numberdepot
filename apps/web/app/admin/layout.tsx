@@ -48,7 +48,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [loading, user, isAdmin, router, isSetupPage]);
 
-  // Setup page renders without admin layout
+  // Setup page renders without admin 
   if (isSetupPage) {
     return <>{children}</>;
   }
