@@ -13,6 +13,7 @@ import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ArticleIcon from '@mui/icons-material/Article';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useAuth } from '@/lib/auth';
@@ -24,6 +25,7 @@ const navItems = [
   { label: 'Users', icon: <PeopleIcon fontSize="small" />, href: '/admin/users' },
   { label: 'Orders', icon: <ShoppingCartIcon fontSize="small" />, href: '/admin/orders' },
   { label: 'Broker Apps', icon: <AssignmentIndIcon fontSize="small" />, href: '/admin/brokers' },
+  { label: 'Offers', icon: <LocalOfferIcon fontSize="small" />, href: '/admin/offers' },
   { label: 'Commissions', icon: <AccountBalanceWalletIcon fontSize="small" />, href: '/admin/commissions' },
   { label: 'Pricing', icon: <AttachMoneyIcon fontSize="small" />, href: '/admin/pricing' },
   { label: 'NumberBarn', icon: <StorefrontIcon fontSize="small" />, href: '/admin/numberbarn' },

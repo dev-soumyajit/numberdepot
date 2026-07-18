@@ -161,7 +161,7 @@ export default function AdminNumberBarnPage() {
             NumberBarn Integration
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Hybrid search: Your inventory + NumberBarn&apos;s 54M+ numbers
+            NumberBarn is an external phone number marketplace. When enabled, customer searches show your own inventory first, and fill in with NumberBarn&apos;s 54M+ numbers when needed. Configure API keys and markup % here.
           </Typography>
         </Box>
         <Button

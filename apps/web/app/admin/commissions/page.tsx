@@ -134,7 +134,7 @@ export default function AdminCommissionsPage() {
           Commissions
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-          Revenue and commission overview
+          When a seller&apos;s number is sold, the platform takes a commission. Track total revenue, pending payouts, and paid commissions here.
         </Typography>
       </Box>
 

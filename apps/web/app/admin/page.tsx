@@ -8,8 +8,9 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
 import Skeleton from '@mui/material/Skeleton';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
 import PeopleIcon from '@mui/icons-material/People';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -20,6 +21,24 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { api } from '@/lib/api';
 import { useSnackbar } from '@/lib/snackbar';
 
+interface RecentOrder {
+  id: string;
+  orderNumber: string;
+  status: string;
+  totalAmount: number;
+  itemCount: number;
+  createdAt: string;
+}
+
+interface RecentOffer {
+  id: string;
+  number: string;
+  offerAmount: number;
+  listingPrice: number;
+  status: string;
+  createdAt: string;
+}
+
 interface DashboardMetrics {
   totalUsers: number;
   totalNumbers: number;
@@ -27,6 +46,8 @@ interface DashboardMetrics {
   totalRevenue: number;
   newUsersThisMonth: number;
   pendingBrokers: number;
+  recentOrders: RecentOrder[];
+  recentOffers: RecentOffer[];
 }
 
 const statCardConfig = [
@@ -37,6 +58,16 @@ const statCardConfig = [
   { key: 'newUsersThisMonth', label: 'New Users This Month', icon: <PersonAddIcon />, color: '#7B68EE', format: 'number' },
   { key: 'pendingBrokers', label: 'Pending Brokers', icon: <PendingActionsIcon />, color: '#E74C3C', format: 'number' },
 ] as const;
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'completed': case 'accepted': return 'success';
+    case 'pending': return 'warning';
+    case 'processing': case 'countered': return 'info';
+    case 'cancelled': case 'failed': case 'declined': case 'expired': return 'error';
+    default: return 'default';
+  }
+};
 
 export default function AdminDashboardPage() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -130,6 +161,113 @@ export default function AdminDashboardPage() {
             </Card>
           </Grid>
         ))}
+      </Grid>
+
+      {/* Recent Orders & Offers */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {/* Recent Orders */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card sx={{ borderRadius: 3, border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', height: '100%' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a2e' }}>
+                  Recent Orders
+                </Typography>
+                <Button
+                  size="small"
+                  endIcon={<ArrowForwardIcon />}
+                  onClick={() => router.push('/admin/orders')}
+                  sx={{ textTransform: 'none', fontWeight: 600, color: '#002664' }}
+                >
+                  View All
+                </Button>
+              </Box>
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} height={48} sx={{ mb: 1 }} />
+                ))
+              ) : !metrics?.recentOrders?.length ? (
+                <Typography variant="body2" sx={{ color: 'text.secondary', py: 3, textAlign: 'center' }}>
+                  No orders yet
+                </Typography>
+              ) : (
+                metrics.recentOrders.map((order, i) => (
+                  <Box key={order.id}>
+                    {i > 0 && <Divider sx={{ my: 1.5 }} />}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
+                          {order.orderNumber}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          {order.itemCount} item{order.itemCount !== 1 ? 's' : ''} &middot; {new Date(order.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                          ${order.totalAmount.toFixed(2)}
+                        </Typography>
+                        <Chip label={order.status} size="small" color={getStatusColor(order.status) as any} sx={{ height: 20, fontSize: '0.7rem' }} />
+                      </Box>
+                    </Box>
+                  </Box>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Recent Offers */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card sx={{ borderRadius: 3, border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', height: '100%' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a1a2e' }}>
+                  Recent Offers
+                </Typography>
+                <Button
+                  size="small"
+                  endIcon={<ArrowForwardIcon />}
+                  onClick={() => router.push('/admin/offers')}
+                  sx={{ textTransform: 'none', fontWeight: 600, color: '#002664' }}
+                >
+                  View All
+                </Button>
+              </Box>
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} height={48} sx={{ mb: 1 }} />
+                ))
+              ) : !metrics?.recentOffers?.length ? (
+                <Typography variant="body2" sx={{ color: 'text.secondary', py: 3, textAlign: 'center' }}>
+                  No offers yet
+                </Typography>
+              ) : (
+                metrics.recentOffers.map((offer, i) => (
+                  <Box key={offer.id}>
+                    {i > 0 && <Divider sx={{ my: 1.5 }} />}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
+                          {offer.number}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Listed: ${offer.listingPrice.toFixed(2)} &middot; {new Date(offer.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#84BD00' }}>
+                          ${offer.offerAmount.toFixed(2)}
+                        </Typography>
+                        <Chip label={offer.status} size="small" color={getStatusColor(offer.status) as any} sx={{ height: 20, fontSize: '0.7rem' }} />
+                      </Box>
+                    </Box>
+                  </Box>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
 
       {/* Quick Actions */}

@@ -123,7 +123,7 @@ export default function BulkUploadPage() {
             Required column: <strong>TN</strong> (or &quot;number&quot;). The system auto-detects toll-free, vanity, and premium numbers. Pricing defaults are applied if not provided.
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            Supported columns: TN, Nickname, City, State, Account Number, PIN, price, monthlyPrice, setupFee, numberType, isPremium
+            Supported columns: TN, Nickname, City, State, Account Number, PIN, price, monthlyPrice, setupFee, numberType, isPremium, allowOffers, minimumOffer
           </Typography>
           <Typography component="div" variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace', bgcolor: '#f5f7fa', p: 1, borderRadius: 1, fontSize: '0.75rem' }}>
             TN,Nickname,Account Number,PIN,City,State,Transfer Lock<br />

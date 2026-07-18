@@ -155,7 +155,7 @@ export default function AdminSettingsPage() {
             Platform Settings
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Configure platform-wide settings
+            Global settings that affect the entire platform — site name, contact info, API keys, commission rates, and other configuration options.
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1.5 }}>

@@ -109,7 +109,7 @@ export default function AdminBrokersPage() {
           Broker Applications
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-          Review and manage broker applications
+          Users who apply to become sellers/brokers show up here. Approve or reject their applications to allow them to list and sell numbers on the platform.
         </Typography>
       </Box>
 

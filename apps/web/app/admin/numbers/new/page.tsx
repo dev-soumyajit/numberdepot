@@ -28,6 +28,8 @@ interface NumberForm {
   isVanity: boolean;
   isTollFree: boolean;
   isPremium: boolean;
+  allowOffers: boolean;
+  minimumOffer: string;
   listingTitle: string;
   listingDescription: string;
   category: string;
@@ -44,6 +46,8 @@ const initialForm: NumberForm = {
   isVanity: false,
   isTollFree: false,
   isPremium: false,
+  allowOffers: true,
+  minimumOffer: '',
   listingTitle: '',
   listingDescription: '',
   category: '',
@@ -100,6 +104,8 @@ export default function AdminAddNumberPage() {
           isTollFree: form.isTollFree,
           isPremium: form.isPremium,
         },
+        allowOffers: form.allowOffers,
+        minimumOffer: form.minimumOffer ? parseFloat(form.minimumOffer) : undefined,
         listing: {
           title: form.listingTitle.trim() || undefined,
           description: form.listingDescription.trim() || undefined,
@@ -264,7 +270,32 @@ export default function AdminAddNumberPage() {
               }
               label="Premium"
             />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={form.allowOffers}
+                  onChange={handleSwitch('allowOffers')}
+                  sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#4BA0A1' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#4BA0A1' } }}
+                />
+              }
+              label="Allow Offers"
+            />
           </Box>
+          {form.allowOffers && (
+            <Box sx={{ mt: 2, maxWidth: 300 }}>
+              <TextField
+                label="Minimum Offer ($)"
+                type="number"
+                placeholder="Leave empty for 70% of sale price"
+                value={form.minimumOffer}
+                onChange={handleChange('minimumOffer')}
+                fullWidth
+                size="small"
+                slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+                helperText="Minimum amount buyers can offer. Defaults to 70% of sale price if empty."
+              />
+            </Box>
+          )}
 
           <Divider sx={{ my: 4 }} />
 

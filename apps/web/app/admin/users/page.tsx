@@ -20,9 +20,15 @@ import Menu from '@mui/material/Menu';
 import CircularProgress from '@mui/material/CircularProgress';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import BlockIcon from '@mui/icons-material/Block';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import LockResetIcon from '@mui/icons-material/LockReset';
 import { api } from '@/lib/api';
 import { useSnackbar } from '@/lib/snackbar';
 
@@ -50,6 +56,9 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [resetDialog, setResetDialog] = useState<User | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetting, setResetting] = useState(false);
 
   const { showSnackbar } = useSnackbar();
 
@@ -100,6 +109,22 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!resetDialog || !newPassword) return;
+    setResetting(true);
+    try {
+      await api.put(`/users/${resetDialog.id}/reset-password`, { newPassword });
+      showSnackbar(`Password reset for ${resetDialog.email}`, 'success');
+      setResetDialog(null);
+      setNewPassword('');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to reset password';
+      showSnackbar(message, 'error');
+    } finally {
+      setResetting(false);
+    }
+  };
+
   const openMenu = (event: React.MouseEvent<HTMLElement>, user: User) => {
     setAnchorEl(event.currentTarget);
     setSelectedUser(user);
@@ -132,7 +157,7 @@ export default function AdminUsersPage() {
           Users Management
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-          View and manage all platform users
+          All registered users (buyers, sellers, admins). View profiles, change roles, activate/deactivate accounts.
         </Typography>
       </Box>
 
@@ -317,7 +342,49 @@ export default function AdminUsersPage() {
             <BlockIcon fontSize="small" /> Ban
           </MenuItem>
         )}
+        <MenuItem
+          onClick={() => {
+            setResetDialog(selectedUser);
+            setAnchorEl(null);
+          }}
+          sx={{ gap: 1.5, color: '#7B68EE' }}
+        >
+          <LockResetIcon fontSize="small" /> Reset Password
+        </MenuItem>
       </Menu>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={!!resetDialog} onClose={() => { setResetDialog(null); setNewPassword(''); }} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>Reset Password</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Set a new password for <strong>{resetDialog?.email}</strong>
+          </Typography>
+          <TextField
+            label="New Password"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            fullWidth
+            autoFocus
+            helperText="Minimum 6 characters"
+            error={newPassword.length > 0 && newPassword.length < 6}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => { setResetDialog(null); setNewPassword(''); }} disabled={resetting}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleResetPassword}
+            disabled={resetting || newPassword.length < 6}
+            sx={{ bgcolor: '#002664', '&:hover': { bgcolor: '#001a45' } }}
+          >
+            {resetting ? 'Resetting...' : 'Reset Password'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

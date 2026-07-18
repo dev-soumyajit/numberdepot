@@ -194,7 +194,7 @@ export default function AdminPricingPage() {
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a2e' }}>Pricing Management</Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Manage service plans and checkout fees
+            Set monthly prices for each service plan (Park, Forward, Unlimited, Business) and configure one-time checkout fees like setup or porting charges. These prices appear on the public pricing page.
           </Typography>
         </Box>
       </Box>

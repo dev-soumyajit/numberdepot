@@ -30,6 +30,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import DownloadIcon from '@mui/icons-material/Download';
 import { api } from '@/lib/api';
 import { useSnackbar } from '@/lib/snackbar';
 
@@ -265,10 +266,42 @@ export default function AdminNumbersPage() {
             Numbers Management{total > 0 && !loading ? ` (${total.toLocaleString()})` : ''}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Manage all platform and broker numbers
+            Add, edit, delete, and bulk-manage phone numbers listed on the platform. Search by number or vanity text, filter by source/status/type, and control offer settings per number.
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={() => {
+              const params = new URLSearchParams();
+              if (sourceFilter) params.set('source', sourceFilter);
+              if (statusFilter) params.set('status', statusFilter);
+              const token = localStorage.getItem('token');
+              fetch(`/api/numbers/admin/export?${params}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+              })
+                .then((res) => res.blob())
+                .then((blob) => {
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `numbers-export-${new Date().toISOString().split('T')[0]}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                })
+                .catch(() => showSnackbar('Export failed', 'error'));
+            }}
+            sx={{
+              borderColor: '#002664',
+              color: '#002664',
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
+          >
+            Export CSV
+          </Button>
           <Button
             variant="outlined"
             startIcon={<UploadFileIcon />}

@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const auth = requireAdmin(req);
     const body = await req.json();
 
-    const { number, numberType, price, monthlyPrice, setupFee, vanityText, description, isPremium } = body;
+    const { number, numberType, price, monthlyPrice, setupFee, vanityText, description, isPremium, allowOffers, minimumOffer } = body;
 
     if (!number) {
       return NextResponse.json({ error: 'Number is required' }, { status: 400 });
@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
       status: 'available' as const,
       isVanity: !!vanityText,
       isPremium: isPremium ?? false,
+      allowOffers: allowOffers ?? true,
+      minimumOffer: minimumOffer != null ? dollarsToCents(minimumOffer) : undefined,
       features: ['Call Forwarding', 'Voicemail', 'Caller ID'],
       description: description || '',
       createdBy: new ObjectId(auth.userId),

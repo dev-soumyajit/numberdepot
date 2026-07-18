@@ -109,6 +109,8 @@ export async function POST(req: NextRequest) {
     const premiumIdx = findCol('ispremium', 'is_premium', 'premium');
     const accountIdx = findCol('account number', 'account_number', 'accountnumber');
     const pinIdx = findCol('pin');
+    const allowOffersIdx = findCol('allowoffers', 'allow_offers');
+    const minOfferIdx = findCol('minimumoffer', 'minimum_offer', 'minoffer', 'min_offer');
 
     const col = await getNumbersCollection();
     const now = new Date();
@@ -195,6 +197,8 @@ export async function POST(req: NextRequest) {
           status: 'available' as const,
           isVanity: !!vanityText,
           isPremium,
+          allowOffers: allowOffersIdx !== -1 && cols[allowOffersIdx] ? !['false', '0', 'no'].includes(cols[allowOffersIdx].toLowerCase()) : undefined,
+          minimumOffer: minOfferIdx !== -1 && cols[minOfferIdx] ? dollarsToCents(parseFloat(cols[minOfferIdx])) : undefined,
           features: ['Call Forwarding', 'Voicemail', 'Caller ID'],
           description: city && state ? `${city}, ${state}` : '',
           city: city || undefined,

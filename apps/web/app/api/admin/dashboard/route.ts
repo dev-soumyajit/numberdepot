@@ -19,6 +19,8 @@ export async function GET(req: NextRequest) {
       revenueAgg,
       newUsersThisMonth,
       pendingOrders,
+      recentOrders,
+      recentOffers,
     ] = await Promise.all([
       db.collection('users').countDocuments(),
       db.collection('numbers').countDocuments({ status: 'available' }),
@@ -29,6 +31,8 @@ export async function GET(req: NextRequest) {
       ]).toArray(),
       db.collection('users').countDocuments({ createdAt: { $gte: startOfMonth } }),
       db.collection('orders').countDocuments({ status: 'pending' }),
+      db.collection('orders').find().sort({ createdAt: -1 }).limit(5).toArray(),
+      db.collection('offers').find().sort({ createdAt: -1 }).limit(5).toArray(),
     ]);
 
     const totalRevenue = revenueAgg[0]?.total || 0;
@@ -44,6 +48,22 @@ export async function GET(req: NextRequest) {
         totalRevenue: centsToDollars(totalRevenue),
         newUsersThisMonth,
         pendingBrokers,
+        recentOrders: recentOrders.map((o) => ({
+          id: o._id.toString(),
+          orderNumber: o.orderNumber || o._id.toString().substring(0, 8),
+          status: o.status,
+          totalAmount: centsToDollars(o.totalAmount || 0),
+          itemCount: o.items?.length || 0,
+          createdAt: o.createdAt?.toISOString?.() || new Date().toISOString(),
+        })),
+        recentOffers: recentOffers.map((o) => ({
+          id: o._id.toString(),
+          number: o.formattedNumber || o.number,
+          offerAmount: centsToDollars(o.offerAmount || 0),
+          listingPrice: centsToDollars(o.listingPrice || 0),
+          status: o.status,
+          createdAt: o.createdAt?.toISOString?.() || new Date().toISOString(),
+        })),
       },
     });
   });

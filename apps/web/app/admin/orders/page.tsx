@@ -19,6 +19,8 @@ import Collapse from '@mui/material/Collapse';
 import CircularProgress from '@mui/material/CircularProgress';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import DownloadIcon from '@mui/icons-material/Download';
+import Button from '@mui/material/Button';
 import { api } from '@/lib/api';
 import { useSnackbar } from '@/lib/snackbar';
 
@@ -185,13 +187,46 @@ export default function AdminOrdersPage() {
 
   return (
     <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a2e' }}>
-          Orders Management
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-          View and manage all platform orders
-        </Typography>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a2e' }}>
+            Orders Management
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+            All customer purchases appear here. Track order status (pending, processing, completed, failed) and view order details including items, totals, and payment info.
+          </Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          startIcon={<DownloadIcon />}
+          onClick={() => {
+            const params = new URLSearchParams();
+            if (statusFilter) params.set('status', statusFilter);
+            const token = localStorage.getItem('token');
+            fetch(`/api/orders/admin/export?${params}`, {
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+            })
+              .then((res) => res.blob())
+              .then((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `orders-export-${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              })
+              .catch(() => showSnackbar('Export failed', 'error'));
+          }}
+          sx={{
+            borderColor: '#002664',
+            color: '#002664',
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600,
+          }}
+        >
+          Export CSV
+        </Button>
       </Box>
 
       {/* Filters */}
